@@ -1,3 +1,5 @@
+from ckeditor.fields import RichTextField
+
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -55,17 +57,21 @@ class Article(models.Model):
             'Article safe URL'),
         max_length=255,
         unique=True)
-    body = models.TextField(
-        verbose_name=_('Body'),
+    body = RichTextField(
+        verbose_name=_('Write your Article'),
         unique=True,
     )
     image = models.ImageField(
-        verbose_name=_('Article Image'),
+        verbose_name=_('Article Preview Image'),
         help_text=_('Upload image image'),
         upload_to='images/articles/',
         default='images/default.png',
     )
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name=_('Choose a Topic'
+                       ))
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     is_active = models.BooleanField(
         verbose_name=_('Category visibility'),
@@ -78,11 +84,11 @@ class Article(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = _('Category')
-        verbose_name_plural = _('Categories')
+        verbose_name = _('Article')
+        verbose_name_plural = _('Articles')
 
     def get_absolute_url(self):
-        return reverse('posts:categories', args=[self.slug])
+        return reverse('posts:articles', args=[self.slug])
 
     def __str__(self):
         return self.title

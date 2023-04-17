@@ -17,7 +17,7 @@ from .models import UserModel
 from .tokens import account_activation_token, password_reset_token
 
 
-@login_required
+# @login_required
 def dashboard(request):
 
     return render(request, 'accounts/dashboard/index.html', {})

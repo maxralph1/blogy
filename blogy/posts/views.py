@@ -93,15 +93,16 @@ def delete_category(request, category_slug):
 
 # Articles
 
-@login_required
+# @login_required
 def articles(request):
-    articles = Article.objects.filter(
-        added_by=request.user, is_active=True).order_by('-updated_at')
+    # articles = Article.objects.filter(
+    #     added_by=request.user, is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/articles/index.html', {'articles': articles})
+    return render(request, 'posts/articles/index.html')
+    # return render(request, 'posts/articles/index.html', {'articles': articles})
 
 
-@login_required
+# @login_required
 def add_article(request):
     if request.method == 'POST':
         article_form = ArticleForm(request.POST, request.FILES)
@@ -111,24 +112,30 @@ def add_article(request):
             article.title = article_form.cleaned_data['title']
             article.category = article_form.cleaned_data['category']
             article.slug = slugify(
-                article.title + article.category + str(datetime.now()),
+                str(article.title) + str(article.category) +
+                str(datetime.now()),
                 allow_unicode=False
             )
             article.body = article_form.cleaned_data['body']
             article.image = article_form.cleaned_data['image']
+            article.added_by = request.user
             article.save()
 
             messages.success(request, article.title + ' added')
 
             return redirect('posts:articles')
-
         else:
-            article_form = ArticleForm()
+            messages.warning(
+                request, article.title + ' not added')
+            return redirect('posts:add_article')
 
-        return render(request, 'posts/articles/add.html', {'article_form': article_form})
+    else:
+        article_form = ArticleForm()
+
+    return render(request, 'posts/articles/add.html', {'article_form': article_form})
 
 
-@login_required
+# @login_required
 def view_article(request, article_slug):
     article = get_object_or_404(
         Article, slug=article_slug, added_by=request.user, is_active=True)
@@ -142,7 +149,7 @@ def view_article(request, article_slug):
     })
 
 
-@login_required
+# @login_required
 def update_article(request, article_slug):
     article = Article.objects.get(
         slug=article_slug, added_by=request.user, is_active=True)
@@ -162,7 +169,7 @@ def update_article(request, article_slug):
     })
 
 
-@login_required
+# @login_required
 def delete_article(request, article_slug):
     article = get_object_or_404(
         Article, slug=article_slug, added_by=request.user, is_active=True)
@@ -177,12 +184,13 @@ def delete_article(request, article_slug):
 
 # Comments
 
-@login_required
+# @login_required
 def comments(request):
-    comments = Comment.objects.filter(
-        added_by=request.user, is_active=True).order_by('-updated_at')
+    # comments = Comment.objects.filter(
+    #     added_by=request.user, is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/comments/index.html', {'comments': comments})
+    return render(request, 'posts/comments/index.html')
+    # return render(request, 'posts/comments/index.html', {'comments': comments})
 
 
 @login_required

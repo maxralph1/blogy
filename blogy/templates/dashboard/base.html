@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="keywords"
+            content="blogy, blog">
+        <meta name="author" content="Maximillian Raphaels">
+        <meta name="description"
+            content="Blogy is an blog application">
+        <meta name="robots" content="noindex,nofollow">
+        <title>Blogy | </title>
+        <!-- Favicon icon -->
+        <link rel="icon" type="image/png" sizes="16x16" href="#">
+        <!-- Styles -->
+        <link href="{% static 'css/style.min.css' %}" rel="stylesheet">
+        {% block styles %} {% endblock %}
+
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+
+        <!-- Scripts -->
+        <!-- <script src="{% static 'js/bootstrap.bundle.min.js' %}" defer></script> -->
+        <!-- <script src="{% static 'js/app-style-switcher.js' %}" defer></script> -->
+        <script src="{% static 'js/jquery.min.js' %}" defer></script>
+        <!-- <script src="{% static 'js/sidebarmenu.js' %}" defer></script> -->
+        <script src="{% static 'js/custom.js' %}" defer></script>
+        {% block scripts %} {% endblock %}
+    </head>
+
+    <body style="font-family: 'Raleway', sans-serif;">
+        <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+            data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+
+            {% include './includes/topnav.html' %}
+
+            {% include './includes/sidenav.html' %}
+
+            <div class="page-wrapper">
+                <div class="page-breadcrumb">
+                    <div class="row align-items-center">
+                        <div class="col-5">
+                            <h4 class="page-title">Dashboard</h4>
+                            <div class="d-flex align-items-center">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb fs-5">
+                                        <li class="breadcrumb-item"><a href="#" class="text-dark">Home</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Library</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="col-7">
+                            <div class="text-end upgrade-btn">
+                                <a href="https://www.wrappixel.com/templates/xtremeadmin/" class="btn btn-danger text-white"
+                                    target="_blank">Upgrade to Pro</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <main class="container-fluid">
+
+                    {% block main %}
+                    {% endblock %}
+
+                </main>
+
+                <footer class="footer text-center">
+                    &copy; 2023. <a href="/" target="_blank" class="text-decoration-none text-danger fw-bold">Blogy</a>.
+                </footer>
+            </div>
+        </div>
+    </body>
+
+</html>

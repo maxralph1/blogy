@@ -1,3 +1,5 @@
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
 from django import forms
 from .models import Category, Article, Comment, Reaction
 
@@ -29,6 +31,7 @@ class CategoryForm(forms.ModelForm):
 
 class ArticleForm(forms.ModelForm):
     class Meta:
+        content = forms.CharField(widget=CKEditorUploadingWidget())
         model = Article
         fields = ['title', 'body', 'image', 'category']
 
@@ -52,20 +55,32 @@ class ArticleForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['title'].widget.attrs.update(
             {'type': 'text', 'name': 'title', 'id': 'title',
-                'class': 'form-control', 'placeholder': 'Title', 'required': 'required'}
+                'class': 'form-control form-control-line', 'placeholder': 'Title', 'required': 'required'}
         )
+        # self.fields['body'].widget.attrs.update(
+        #     {'type': 'text', 'name': 'body', 'id': 'body',
+        #         'class': 'form-control', 'placeholder': 'Write your article', 'required': 'required'}
+        # )
+
         self.fields['body'].widget.attrs.update(
-            {'type': 'text', 'name': 'body', 'id': 'body',
-                'class': 'form-control', 'placeholder': 'Write your article', 'required': 'required'}
-        )
+            widget=CKEditorUploadingWidget())
+
         self.fields['image'].widget.attrs.update(
             {'type': 'file', 'name': 'image', 'id': 'image',
-                'class': 'form-control', 'placeholder': 'e.g. img/hsg.jpg'}
+                'class': 'form-control form-control-line', 'placeholder': 'e.g. img/hsg.jpg'}
         )
         self.fields['category'].widget.attrs.update(
             {'type': 'text', 'name': 'category', 'id': 'category',
-                'class': 'form-select', 'placeholder': 'Choose category', 'required': 'required'}
+                'class': 'form-select shadow-none form-control-line', 'placeholder': 'Choose category'}
         )
+
+
+# class ArticleForm(forms.ModelForm):
+#     content = forms.CharField(widget=CKEditorUploadingWidget())
+
+#     class Meta:
+#         model = Article
+#         fields = '__all__'
 
 
 class CommentForm(forms.ModelForm):
