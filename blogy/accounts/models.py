@@ -54,40 +54,60 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         _('Username'),
         max_length=100,
-        unique=True)
+        unique=True
+    )
     email = models.CharField(
         _('Email Address'),
         max_length=150,
-        unique=True)
+        unique=True
+    )
     name = models.CharField(
         _('Name'),
-        max_length=100)
-    password = models.CharField(_('Password'), max_length=50)
+        max_length=100
+    )
+    password = models.CharField(
+        _('Password'),
+        max_length=50
+    )
     phone = models.CharField(
         _('Phone Number'),
         max_length=20,
-        blank=True)
-    logo = models.ImageField(
+        null=True,
+        blank=True
+    )
+    photo = models.ImageField(
         verbose_name=_('Blogger photo'),
         help_text=_('Upload image'),
         upload_to='images/bloggers/',
         default='images/default.png',
+        null=True,
+        blank=True
     )
     about_me = models.CharField(
         _('About me'),
-        max_length=100)
+        max_length=100,
+        null=True,
+        blank=True
+    )
     web = models.CharField(
         verbose_name=_('Blogger Website'),
         max_length=255,
+        null=True,
+        blank=True
     )
     instagram = models.CharField(
         verbose_name=_('Blogger Instagram'),
         max_length=255,
+        null=True,
+        blank=True
     )
     twitter = models.CharField(
         verbose_name=_('Blogger Twitter'),
         max_length=255,
+        null=True,
+        blank=True
     )
+    remember_me = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -107,10 +127,10 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
         send_mail(
             subject,
             message,
-            'no-reply@gem-inn.com',
+            'no-reply@blogy.com',
             [self.email],
             fail_silently=False
         )
 
     def __str__(self):
-        return self.name
+        return self.username

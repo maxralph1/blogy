@@ -1,12 +1,12 @@
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 from django import forms
-from .models import Category, Article, Comment, Reaction
+from .models import Topic, Article, Comment, Reaction
 
 
-class CategoryForm(forms.ModelForm):
+class TopicForm(forms.ModelForm):
     class Meta:
-        model = Category
+        model = Topic
         fields = ['title', 'description']
 
     def clean_title(self):
@@ -25,7 +25,7 @@ class CategoryForm(forms.ModelForm):
         )
         self.fields['description'].widget.attrs.update(
             {'type': 'text', 'name': 'description', 'id': 'description',
-                'class': 'form-control', 'placeholder': 'Describe the category', 'required': 'required'}
+                'class': 'form-control', 'placeholder': 'Describe the topic', 'required': 'required'}
         )
 
 
@@ -33,7 +33,7 @@ class ArticleForm(forms.ModelForm):
     class Meta:
         content = forms.CharField(widget=CKEditorUploadingWidget())
         model = Article
-        fields = ['title', 'body', 'image', 'category']
+        fields = ['title', 'body', 'image', 'topic']
 
     def clean_title(self):
         title = self.cleaned_data['title']
@@ -47,9 +47,9 @@ class ArticleForm(forms.ModelForm):
         image = self.cleaned_data['image']
         return image
 
-    def clean_category(self):
-        category = self.cleaned_data['category']
-        return category
+    def clean_topic(self):
+        topic = self.cleaned_data['topic']
+        return topic
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,11 +57,6 @@ class ArticleForm(forms.ModelForm):
             {'type': 'text', 'name': 'title', 'id': 'title',
                 'class': 'form-control form-control-line', 'placeholder': 'Title', 'required': 'required'}
         )
-        # self.fields['body'].widget.attrs.update(
-        #     {'type': 'text', 'name': 'body', 'id': 'body',
-        #         'class': 'form-control', 'placeholder': 'Write your article', 'required': 'required'}
-        # )
-
         self.fields['body'].widget.attrs.update(
             widget=CKEditorUploadingWidget())
 
@@ -69,18 +64,10 @@ class ArticleForm(forms.ModelForm):
             {'type': 'file', 'name': 'image', 'id': 'image',
                 'class': 'form-control form-control-line', 'placeholder': 'e.g. img/hsg.jpg'}
         )
-        self.fields['category'].widget.attrs.update(
-            {'type': 'text', 'name': 'category', 'id': 'category',
-                'class': 'form-select shadow-none form-control-line', 'placeholder': 'Choose category'}
+        self.fields['topic'].widget.attrs.update(
+            {'type': 'text', 'name': 'topic', 'id': 'topic',
+                'class': 'form-select shadow-none form-control-line', 'placeholder': 'Choose topic'}
         )
-
-
-# class ArticleForm(forms.ModelForm):
-#     content = forms.CharField(widget=CKEditorUploadingWidget())
-
-#     class Meta:
-#         model = Article
-#         fields = '__all__'
 
 
 class CommentForm(forms.ModelForm):

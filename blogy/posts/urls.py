@@ -7,8 +7,24 @@ app_name = 'posts'
 urlpatterns = [
     #     path('', views.home, name='home'),
 
+    # Topics
+    path('topics/', views.topics, name='topics'),
+    path('topics/add/', views.add_topic, name='add_topic'),
+    path('topics/<slug:topic_slug>/',
+         views.view_topic, name='view_topic'),
+    path('topics/<slug:topic_slug>/update/',
+         views.update_topic, name='update_topic'),
+    path('topics/<slug:topic_slug>/delete/',
+         views.delete_topic, name='delete_topic'),
+
     # Articles
     path('articles/', views.articles, name='articles'),
+    path('articles/<int:page>', views.articles_pages, name='articles_pages'),
+    #     path(
+    #         "terms/<int:page>",
+    #         views.listing,
+    #         name="terms-by-page"
+    #     ),
     path('articles/add/', views.add_article, name='add_article'),
     path('articles/<slug:article_slug>/',
          views.view_article, name='view_article'),
@@ -16,6 +32,13 @@ urlpatterns = [
          views.update_article, name='update_article'),
     path('articles/<slug:article_slug>/delete/',
          views.delete_article, name='delete_article'),
+
+    # Authors
+    path('authors/', views.authors, name='authors'),
+    path('authors/<slug:username>/',
+         views.view_author, name='view_author'),
+    path('authors/<slug:username>/delete/',
+         views.delete_author, name='delete_author'),
 
     # Articles
     path('comments/', views.comments, name='comments'),
@@ -26,6 +49,16 @@ urlpatterns = [
          views.update_comment, name='update_comment'),
     path('comments/<slug:comment_slug>/delete/',
          views.delete_comment, name='delete_comment'),
+
+    # Reactions
+    path('reactions/', views.reactions, name='reactions'),
+    #     path('reactions/add/', views.add_reaction, name='add_reaction'),
+    #     path('reactions/<slug:reaction_slug>/',
+    #          views.view_reaction, name='view_reaction'),
+    #     path('reactions/<slug:reaction_slug>/update/',
+    #          views.update_reaction, name='update_reaction'),
+    #     path('reactions/<slug:reaction_slug>/delete/',
+    #          views.delete_reaction, name='delete_reaction'),
 
 
     # # Discounts

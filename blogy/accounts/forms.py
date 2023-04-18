@@ -27,7 +27,7 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = UserModel
-        fields = ('username', 'email', 'name', 'password')
+        fields = ('username', 'email', 'name', 'password', )
 
     def clean_username(self):
         username = self.cleaned_data['username'].lower()
@@ -89,6 +89,7 @@ class UserLoginForm(AuthenticationForm):
             attrs={'type': 'password', 'class': 'form-control',
                    'placeholder': '********', 'id': 'password', 'name': 'password', 'required': 'required'}
         ))
+    remember_me = forms.BooleanField(required=False)
 
 
 class CustomPasswordResetForm(PasswordResetForm):

@@ -8,7 +8,7 @@
         <section class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{% url 'posts:add_article' %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
+                    <form action="{% url 'posts:update_article' article.slug %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
                         {% csrf_token %}
                         {% if form.errors %}
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -54,7 +54,7 @@
                         </div>
                         <div class="row">
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-danger text-white text-end">Add Article</button>
+                                <button type="submit" class="btn btn-danger text-white text-end">Update Article</button>
                             </div>
                         </div>
                     </form>

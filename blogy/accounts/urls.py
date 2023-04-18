@@ -13,38 +13,26 @@ urlpatterns = [
         form_class=UserLoginForm),
         name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/accounts/login/'), name='logout'),
-    path('register/', views.account_register, name='register'),
+    path('register/', views.register, name='register'),
     path('activate/<slug:uidb64>/<slug:token>)/',
          views.account_activate, name='activate'),
     path(
         'password_reset/',
-        views.password_reset,
+        auth_views.PasswordResetView.as_view(
+            template_name='accounts/password_reset/password_reset_form.html',
+            success_url='password_reset_email_confirm',
+            email_template_name='accounts/password_reset/password_reset_email.html',
+            form_class=CustomPasswordResetForm,
+        ),
         name='password_reset',
     ),
-    # path(
-    #     'password_reset/',
-    #     auth_views.PasswordResetView.as_view(
-    #         template_name='accounts/password_reset/password_reset_form.html',
-    #         success_url='password_reset_email_confirm',
-    #         email_template_name='accounts/password_reset/password_reset_email.html',
-    #         form_class=CustomPasswordResetForm,
-    #     ),
-    #     name='password_reset',
-    # ),
-    # path(
-    #     'password_reset_confirm/<uidb64>/<token>/',
-    #     views.password_reset_token_confirm,
-    #     name='password_reset_token_confirm',
-    # ),
     path(
-        'password_reset_confirm/<uidb64>/<token>/',
+        'password_reset_confirm/<uidb64>/<token>',
         auth_views.PasswordResetConfirmView.as_view(
             template_name='accounts/password_reset/password_reset_confirm.html',
             success_url='password_reset_complete/',
             form_class=PasswordResetConfirmForm),
         name='password_reset_token_confirm'),
-    path('activate/<slug:user>/',
-         views.password_edit, name='password_edit'),
     path(
         'password_reset/password_reset_email_confirm/',
         TemplateView.as_view(
@@ -60,12 +48,18 @@ urlpatterns = [
 
     # User dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('profile/edit/', views.edit_details, name='edit_details'),
+    path('profile/', views.edit_details, name='profile'),
     path('profile/delete_user/', views.delete_user, name='delete_user'),
     path(
         'profile/delete_confirm/',
         TemplateView.as_view(
             template_name='accounts/users/delete_confirm.html'),
         name='delete_confirmation',
-    )
+    ),
+
+    # # User Activities
+    # path('<slug:user_slug>/articles/', views.user_articles, name='user_articles'),
+    # path('<slug:user_slug>/comments/', views.user_comments, name='user_comments'),
+    # path('<slug:user_slug>/reactions/',
+    #      views.user_reactions, name='user_reactions')
 ]

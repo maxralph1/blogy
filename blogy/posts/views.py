@@ -1,108 +1,162 @@
 from datetime import datetime
+import random
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Article, Comment, Reaction
-from .forms import CategoryForm, ArticleForm, CommentForm, ReactionForm
+from .models import Topic, Article, Comment, Reaction
+from accounts.models import UserModel
+from .forms import TopicForm, ArticleForm, CommentForm, ReactionForm
 
 
-# Categories
-
-@login_required
-def categories(request):
-    categories = Category.objects.filter(added_by=request.user,
-                                         is_active=True).order_by('-updated_at')
-
-    return render(request, 'posts/categories/index.html', {'categories': categories})
-
+# Topics
 
 @login_required
-def add_category(request):
+def topics(request):
+    topics = Topic.objects.filter(is_active=True).order_by('-updated_at')
+    # topics = Topic.objects.filter(added_by=request.user,
+    #                               is_active=True).order_by('-updated_at')
+
+    return render(request, 'posts/topics/index.html', {'topics': topics})
+
+
+@login_required
+def add_topic(request):
     if request.method == 'POST':
-        category_form = CategoryForm(request.POST)
+        topic_form = TopicForm(request.POST)
 
-        if category_form.is_valid():
-            category = category_form.save(commit=False)
-            category.title = category_form.cleaned_data['title']
-            category.slug = slugify(category.title, allow_unicode=False)
-            category.description = category_form.cleaned_data['description']
-            category.added_by = request.user
-            category.save()
+        if topic_form.is_valid():
+            topic = topic_form.save(commit=False)
+            topic.title = topic_form.cleaned_data['title']
+            topic.slug = slugify(topic.title, allow_unicode=False)
+            topic.description = topic_form.cleaned_data['description']
+            topic.representative_color = random.choice(
+                ['primary', 'secondary', 'success', 'info', 'warning', 'danger'])
+            topic.added_by = request.user
+            topic.save()
 
-            messages.success(request, category.title + ' added')
+            messages.success(request, topic.title + ' added')
 
-            return redirect('accounts:dashboard')
+            return HttpResponseRedirect(reverse('posts:topics'))
         else:
             return HttpResponse('Error', status=400)
 
     else:
-        category_form = CategoryForm()
+        topic_form = TopicForm()
 
-    return render(request, 'posts/categories/add.html', {'category_form': category_form})
+    return render(request, 'posts/topics/add.html', {'topic_form': topic_form})
 
 
 @login_required
-def view_category(request, category_slug):
-    category = get_object_or_404(
-        Category, slug=category_slug, added_by=request.user, is_active=True)
+def view_topic(request, topic_slug):
+    topic = get_object_or_404(
+        Topic, slug=topic_slug, is_active=True)
 
-    articles_belonging_to_category = Article.objects.filter(
-        category=category, is_active=True).order_by('-updated_at')
+    articles_belonging_to_topic = Article.objects.filter(
+        topic=topic, is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/categories/category.html', {
-        'category': category,
-        'articles_belonging_to_category': articles_belonging_to_category
+    return render(request, 'posts/topics/topic.html', {
+        'topic': topic,
+        'articles_belonging_to_topic': articles_belonging_to_topic
     })
 
 
 @login_required
-def update_category(request, category_slug):
-    if request.method == 'POST':
-        category = Category.objects.get(
-            slug=category_slug, added_by=request.user)
-        category_form = CategoryForm(isinstance=category, data=request.POST)
-        if category_form.is_valid():
-            category_form.save()
-            return HttpResponseRedirect(reverse('accounts:dashboard'))
+def update_topic(request, topic_slug):
+    topic = get_object_or_404(
+        Topic, slug=topic_slug, added_by=request.user, is_active=True)
+
+    if request.method == 'POST' and topic.added_by == request.user:
+        topic_form = TopicForm(instance=topic, data=request.POST)
+        if topic_form.is_valid():
+            topic_form.save()
+            return HttpResponseRedirect(reverse('posts:topics'))
 
     else:
-        category = Category.objects.get(slug=category_slug)
-        category_slug = CategoryForm(instance=category)
+        topic_form = TopicForm(instance=topic)
 
-    return render(request, 'posts/categories/edit.html', {'category': category})
+    return render(request, 'posts/topics/edit.html', {
+        'topic': topic,
+        'topic_form': topic_form
+    })
 
 
 @login_required
-def delete_category(request, category_slug):
-    category = get_object_or_404(
-        Category, slug=category_slug, added_by=request.user, is_active=True)
-    category.is_active = False
-    category.deleted_at = datetime.now()
-    category.save()
+def delete_topic(request, topic_slug):
+    topic = get_object_or_404(
+        Topic, slug=topic_slug, added_by=request.user, is_active=True)
 
-    messages.success(request, 'Category removed')
+    if topic.added_by != request.user:
+        messages.warning(request, topic.title + ' cannot be removed by you.')
 
-    return redirect('accounts:dashboard')
+        return HttpResponseRedirect(reverse('posts:topics'))
+
+    else:
+        topic.is_active = False
+        topic.deleted_at = datetime.now()
+        topic.save()
+
+        messages.warning(request, 'Topic removed')
+
+        return HttpResponseRedirect(reverse('posts:topics'))
 
 
 # Articles
 
-# @login_required
 def articles(request):
+    if request.user.is_staff:
+        articles = Article.objects.filter(
+            is_active=True).order_by('-updated_at')
+    else:
+        articles = Article.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(articles, per_page=2)
+    article_objects = paginator.get_page(1)
+    article_objects.adjusted_elided_pages = paginator.get_elided_page_range(1)
+
+    return render(request, 'posts/articles/index.html', {
+        'articles': articles,
+        "article_objects": article_objects
+    })
+
+
+@login_required
+def articles_pages(request, page=1):
     # articles = Article.objects.filter(
     #     added_by=request.user, is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/articles/index.html')
-    # return render(request, 'posts/articles/index.html', {'articles': articles})
+    # return render(request, 'posts/articles/index.html')
+    # # return render(request, 'posts/articles/index.html', {'articles': articles})
+
+    # topics = Topic.objects.filter(is_active=True).order_by('-updated_at')
+    # # topics = Topic.objects.filter(added_by=request.user,
+    # #                               is_active=True).order_by('-updated_at')
+
+    # return render(request, 'posts/topics/index.html', {'topics': topics})
+
+    if request.user.is_staff:
+        articles = Article.objects.filter(
+            is_active=True).order_by('-updated_at')
+    else:
+        articles = Article.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(articles, per_page=2)
+    article_objects = paginator.get_page(page)
+    article_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        page)
+
+    return render(request, 'posts/articles/index.html', {'article_objects': article_objects})
 
 
-# @login_required
+@login_required
 def add_article(request):
     if request.method == 'POST':
         article_form = ArticleForm(request.POST, request.FILES)
@@ -110,9 +164,9 @@ def add_article(request):
         if article_form.is_valid():
             article = article_form.save(commit=False)
             article.title = article_form.cleaned_data['title']
-            article.category = article_form.cleaned_data['category']
+            article.topic = article_form.cleaned_data['topic']
             article.slug = slugify(
-                str(article.title) + str(article.category) +
+                str(article.title) + str(article.topic) +
                 str(datetime.now()),
                 allow_unicode=False
             )
@@ -123,7 +177,7 @@ def add_article(request):
 
             messages.success(request, article.title + ' added')
 
-            return redirect('posts:articles')
+            return HttpResponseRedirect(reverse('posts:articles'))
         else:
             messages.warning(
                 request, article.title + ' not added')
@@ -135,10 +189,14 @@ def add_article(request):
     return render(request, 'posts/articles/add.html', {'article_form': article_form})
 
 
-# @login_required
+@login_required
 def view_article(request, article_slug):
-    article = get_object_or_404(
-        Article, slug=article_slug, added_by=request.user, is_active=True)
+    if request.user.is_staff:
+        article = get_object_or_404(
+            Article, slug=article_slug, is_active=True)
+    else:
+        article = get_object_or_404(
+            Article, slug=article_slug, added_by=request.user, is_active=True)
 
     comments_belonging_to_article = Comment.objects.filter(
         article=article, is_active=True).order_by('-updated_at')
@@ -149,12 +207,12 @@ def view_article(request, article_slug):
     })
 
 
-# @login_required
+@login_required
 def update_article(request, article_slug):
     article = Article.objects.get(
         slug=article_slug, added_by=request.user, is_active=True)
 
-    if request.method == 'POST':
+    if request.method == 'POST' and article.added_by == request.user:
         article_form = ArticleForm(instance=article, data=request.POST)
         if article_form.is_valid():
             article_form.save()
@@ -169,28 +227,79 @@ def update_article(request, article_slug):
     })
 
 
-# @login_required
+@login_required
 def delete_article(request, article_slug):
     article = get_object_or_404(
         Article, slug=article_slug, added_by=request.user, is_active=True)
-    article.is_active = False
-    article.deleted_at = datetime.now()
-    article.save()
 
-    messages.success(request, 'Article removed')
+    if article.added_by != request.user:
+        messages.warning(
+            request, 'You do not have permissions to remove ' + article.title + '.')
 
-    return redirect('accounts:dashboard')
+    else:
+        article.is_active = False
+        article.deleted_at = datetime.now()
+        article.save()
+
+        messages.success(request, 'Article' + article.title + ' removed')
+
+    return HttpResponseRedirect(reverse('posts:articles'))
+
+
+@login_required
+def authors(request):
+    if request.user.is_staff:
+        authors = UserModel.objects.filter(
+            is_active=True).order_by('-updated_at')
+
+    return render(request, 'posts/authors/index.html', {'authors': authors})
+
+
+@login_required
+def view_author(request, author_slug):
+    if request.user.is_staff:
+        author = get_object_or_404(
+            UserModel, slug=author_slug, is_active=True)
+
+    return render(request, 'posts/authors/author.html', {
+        'author': author
+    })
+
+
+@login_required
+def delete_author(request, author_slug):
+    if request.user.is_staff:
+        author = get_object_or_404(
+            UserModel, slug=author_slug, added_by=request.user, is_active=True)
+
+        author.is_active = False
+        author.deleted_at = datetime.now()
+        author.save()
+
+        messages.success(request, 'Author' + author.title + ' removed')
+
+        return HttpResponseRedirect(reverse('posts:authors'))
 
 
 # Comments
 
-# @login_required
+@login_required
 def comments(request):
-    # comments = Comment.objects.filter(
-    #     added_by=request.user, is_active=True).order_by('-updated_at')
+    if request.user.is_staff:
+        comments = Comment.objects.filter(
+            is_active=True).order_by('-updated_at')
+    else:
+        comments = Comment.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/comments/index.html')
-    # return render(request, 'posts/comments/index.html', {'comments': comments})
+    paginator = Paginator(comments, per_page=2)
+    comment_objects = paginator.get_page(1)
+    comment_objects.adjusted_elided_pages = paginator.get_elided_page_range(1)
+
+    return render(request, 'posts/comments/index.html', {
+        'comments': comments,
+        "comment_objects": comment_objects
+    })
 
 
 @login_required
@@ -205,7 +314,7 @@ def add_comment(request, article_slug):
             comment = comment_form.save(commit=False)
             comment.title = comment_form.cleaned_data['title']
             comment.slug = slugify(
-                comment.title + article_slug + str(datetime.now()), allow_unicode=False
+                comment.title + str(article_slug) + str(datetime.now()), allow_unicode=False
             )
             comment.body = comment_form.cleaned_data['body']
             comment.article = article.id
@@ -253,6 +362,11 @@ def delete_comment(request, comment_slug):
 
 
 # Reactions
+
+@login_required
+def reactions(request):
+    pass
+
 
 @login_required
 def add_update_article_reaction(request, article_slug):

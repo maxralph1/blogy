@@ -8,7 +8,7 @@
         <section class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{% url 'posts:add_article' %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
+                    <form action="{% url 'posts:update_topic' topic.slug %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
                         {% csrf_token %}
                         {% if form.errors %}
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -17,44 +17,24 @@
                             </div>
                         {% endif %}
                         <div class="row">
-                            <div class="form-group col-md-6">
-                                <label class="col-md-12">{{ article_form.topic.label }}</label>
-                                <div class="d-flex justify-content-between gap-2">
-                                    <div class="col-md-7">
-                                        {{ article_form.topic }}
-                                    </div> 
-                                    <a href="{% url 'posts:add_topic' %}" class="col-md-5 btn btn-sm btn-danger text-white fw-bold fs-6">
-                                        Or Add Topic
-                                    </a>
-                                </div>
-                                                               
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="col-md-12">{{ article_form.image.label }}</label>
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ topic_form.title.label }}</label>
                                 <div class="col-md-12">
-                                    {{ article_form.image }}
+                                    {{ topic_form.title }}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label class="col-md-12">{{ article_form.title.label }}</label>
+                                <label class="col-md-12">{{ topic_form.description.label }}</label>
                                 <div class="col-md-12">
-                                    {{ article_form.title }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-12">
-                                <label class="col-md-12">{{ article_form.body.label }}</label>
-                                <div class="col-md-12">
-                                    {{ article_form.body }}
+                                    {{ topic_form.description }}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-danger text-white text-end">Add Article</button>
+                                <button type="submit" class="btn btn-warning text-white text-end">Update Topic</button>
                             </div>
                         </div>
                     </form>

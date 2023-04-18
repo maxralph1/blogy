@@ -6,27 +6,31 @@ from django.utils.translation import gettext_lazy as _
 from accounts.models import UserModel
 
 
-class Category(models.Model):
+class Topic(models.Model):
     title = models.CharField(
-        verbose_name=_('Category Title'),
+        verbose_name=_('Topic Title'),
         help_text=_('Required and unique'),
-        max_length=255,
+        max_length=30,
         unique=True,
     )
     slug = models.SlugField(
         verbose_name=_(
-            'Category safe URL'),
+            'Topic safe URL'),
         max_length=255,
         unique=True)
     description = models.CharField(
-        verbose_name=_('Category Description'),
+        verbose_name=_('Topic Description'),
         help_text=_('Required and unique'),
         max_length=255,
     )
+    representative_color = models.CharField(
+        max_length=10,
+        default='secondary'
+    )
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     is_active = models.BooleanField(
-        verbose_name=_('Category visibility'),
-        help_text=_('Change category visibility'),
+        verbose_name=_('Topic visibility'),
+        help_text=_('Change topic visibility'),
         default=True,
     )
     created_at = models.DateTimeField(
@@ -35,11 +39,11 @@ class Category(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = _('Category')
-        verbose_name_plural = _('Categories')
+        verbose_name = _('Topic')
+        verbose_name_plural = _('Topics')
 
     def get_absolute_url(self):
-        return reverse('posts:categories', args=[self.slug])
+        return reverse('posts:topics', args=[self.slug])
 
     def __str__(self):
         return self.title
@@ -48,7 +52,7 @@ class Category(models.Model):
 class Article(models.Model):
     title = models.CharField(
         verbose_name=_('Article Title'),
-        help_text=_('Required and unique'),
+        help_text=_('Required, unique and 20 charcters maximum'),
         max_length=255,
         unique=True,
     )
@@ -67,15 +71,15 @@ class Article(models.Model):
         upload_to='images/articles/',
         default='images/default.png',
     )
-    category = models.ForeignKey(
-        Category,
+    topic = models.ForeignKey(
+        Topic,
         on_delete=models.CASCADE,
         verbose_name=_('Choose a Topic'
                        ))
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     is_active = models.BooleanField(
-        verbose_name=_('Category visibility'),
-        help_text=_('Change category visibility'),
+        verbose_name=_('Topic visibility'),
+        help_text=_('Change topic visibility'),
         default=True,
     )
     created_at = models.DateTimeField(
@@ -147,6 +151,12 @@ class Reaction(models.Model):
             'Reaction safe URL'),
         max_length=255,
         unique=True
+    )
+    topic = models.ForeignKey(
+        Topic,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     article = models.ForeignKey(
         Article,

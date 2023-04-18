@@ -6,65 +6,83 @@
 
     <div class="row">
         <section class="col-lg-8">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message|safe }}</strong>. 
+                    <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
             <div class="card">
-                <div class="card-body">
+                <div class="card-body d-flex justify-content-between flex-wrap row-gap-2">
                     <h4 class="card-title">Your Recent Articles</h4>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="text-end">
+                            <a href="{% url 'posts:add_article' %}" class="btn btn-sm btn-danger text-white"><i
+                            class="fa fa-plus-square"></i> Add an Article
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="comment-widgets scrollable">
-                    <div class="d-flex flex-row comment-row m-t-0">
-                        <div class="p-2"><img src="../../assets/images/users/1.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text w-100">
-                            <h6 class="font-medium">James Anderson</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer">
-                                <span class="text-muted float-end">April 14, 2021</span> <span
-                                    class="label label-rounded label-primary">Pending</span> <span
-                                    class="action-icons">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-check"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart"></i></a>
-                                </span>
+                    {% if article_objects %}
+                        {% for article in article_objects %}
+                            <div class="d-flex flex-row comment-row border-bottom border-top">
+                                <a href="{% url 'posts:view_article' article.slug %}" class="text-dark">
+                                    <div class="p-2">
+                                        
+                                        <img src="
+                                            {% if article.image != 'images/default.png' %}
+                                                {{ article.image.url }}
+                                            {% else %}
+                                                {% static 'images/no-image.png' %}
+                                            {% endif %}
+                                        " alt="user" width="150"
+                                        class="object-fit-cover border rounded product-unit-images">
+                                    </div>
+                                    <div class="comment-text active w-100">
+                                        <div class="d-flex flex-column">
+                                            <h6 class="font-medium"><span class="label label-{{ article.topic.representative_color }} label-rounded px-4 py-1 fs-5">{{ article.topic.title }}</span> &nbsp;&nbsp;&nbsp; {{ article.title }}</h6>
+                                            <p class="fst-italic text-muted">by {{ article.added_by.name }}</p>
+                                            <p class="m-b-15 d-block">{{ article.body|truncatewords:25|safe }} </p>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-end gap-4">
+                                            <div class="d-flex justify-content-end gap-4">
+                                             
+                                                    <a href="{% url 'posts:view_article' article.slug %}"><i class="ti-eye text-success fw-bold"></i></a>
+                                                    <a href="{% url 'posts:update_article' article.slug %}"><i class="ti-pencil-alt text-warning"></i></a>
+                                                    <a href="{% url 'posts:delete_article' article.slug %}"><i class="ti-trash text-secondary"></i></a>
+                                           
+                                            </div>
+                                            <div>
+                                                <span class="text-muted float-end fst-italic text-muted">{{ article.created_at }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                
                             </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row comment-row">
-                        <div class="p-2"><img src="../../assets/images/users/4.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text active w-100">
-                            <h6 class="font-medium">Michael Jorden</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer ">
-                                <span class="text-muted float-end">April 14, 2021</span>
-                                <span class="label label-success label-rounded">Approved</span>
-                                <span class="action-icons active">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="icon-close"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart text-danger"></i></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row comment-row">
-                        <div class="p-2"><img src="../../assets/images/users/5.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text w-100">
-                            <h6 class="font-medium">Johnathan Doeting</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer">
-                                <span class="text-muted float-end">April 14, 2021</span>
-                                <span class="label label-rounded label-danger">Rejected</span>
-                                <span class="action-icons">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-check"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart"></i></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                        {% endfor %}
+
+                    {% else %}
+                            <p class="text-center fs-5 my-4">There are no existing articles yet. <a href="{% url 'posts:add_article' %}" class="text-danger">Add One</a>.</p>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    {% for page_number in article_objects.adjusted_elided_pages %}
+                        {% if page_number == article_objects.paginator.ELLIPSIS %}
+                            {{ page_number }}
+                        {% else %}
+                            <a
+                                href="{% url 'posts:articles_pages' page_number %}"
+                                class="btn {% if page_number == article_objects.number %}btn-danger text-white{% else %}btn-light text-dark{% endif %} py-1 px-3 rounded"
+                            >
+                                {{page_number}}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </section>

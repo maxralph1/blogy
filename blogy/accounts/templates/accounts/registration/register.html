@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+    {% block heading %}
+        <h2 class="blog-post-title mb-3 border-bottom pb-4 mb-5 fst-italic"><strong>Register</strong>
+        </h2>
+    {% endblock %}
+
+    {% block main %}
+
+        <form action="." method="POST" enctype="multipart/form-data" class="mt-5">
+            {% csrf_token %}
+            {% if register_form.errors %}
+                <p>Please correct the following errors:</p>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {% for field in register_form %}
+                        {% if field.errors %}
+                            <strong>{{ field.label }}: {{ field.errors|striptags }}</strong>
+                            <br />
+                        {% endif %}
+                    {% endfor %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            <div class="row mb-3">
+                <label for="username" class="col-sm-2 col-form-label">{{ register_form.username.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.username }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">{{ register_form.email.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.email }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="password" class="col-sm-2 col-form-label">{{ register_form.password.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.password }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="password2" class="col-sm-2 col-form-label">{{ register_form.password2.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.password2 }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="name" class="col-sm-2 col-form-label">{{ register_form.name.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.name }}
+                </div>
+            </div>
+            <!-- <div class="row mb-3">
+                <label for="phone" class="col-sm-2 col-form-label">{{ register_form.phone.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.phone }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="photo" class="col-sm-2 col-form-label">{{ register_form.photo.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.photo }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="about_me" class="col-sm-2 col-form-label">{{ register_form.about_me.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.about_me }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="web" class="col-sm-2 col-form-label">{{ register_form.web.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.web }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="instagram" class="col-sm-2 col-form-label">{{ register_form.instagram.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.instagram }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="twitter" class="col-sm-2 col-form-label">{{ register_form.twitter.label }}</label>
+                <div class="col-sm-10">
+                    {{ register_form.twitter }}
+                </div>
+            </div> -->
+
+            <button type="submit" class="btn btn-danger mt-3 float-end">Sign Up</button>
+        </form>
+
+        <div class="row mb-3 mt-5">
+            <div class="col-sm-10 offset-sm-2">
+                <a>Have an account? <a href="{% url 'accounts:login' %}" class="text-danger">Login</a></a>
+            </div>
+        </div>
+
+    {% endblock %}
+
+{% endblock %}

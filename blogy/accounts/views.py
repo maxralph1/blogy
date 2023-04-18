@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,53 +13,23 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
-from .forms import UserRegistrationForm, CustomPasswordResetForm, UserEditForm
+from .forms import UserRegistrationForm, UserLoginForm, CustomPasswordResetForm, UserEditForm
 from .models import UserModel
 from .tokens import account_activation_token, password_reset_token
 
 
-# @login_required
-def dashboard(request):
-
-    return render(request, 'accounts/dashboard/index.html', {})
-
-
-@login_required
-def edit_details(request):
-    if request.method == 'POST':
-        user_form = UserEditForm(instance=request.user, data=request.POST)
-
-        if user_form.is_valid():
-            user_form.save()
-    else:
-        user_form = UserEditForm(instance=request.user)
-
-    return render(request, 'accounts/users/edit.html', {'user_form': user_form})
-
-
-@login_required
-def delete_user(request):
-    user = UserModel.objects.get(user_name=request.user)
-    user.is_active = False
-    user.deleted_at = datetime.now()
-    user.save()
-    logout(request)
-    return redirect('accounts:delete_confirmation')
-
-
-def account_register(request):
+def register(request):
     if request.user.is_authenticated:
         return redirect('accounts:dashboard')
 
     if request.method == 'POST':
-        registerForm = UserRegistrationForm(request.POST)
-        if registerForm.is_valid():
-            user = registerForm.save(commit=False)
-            user.first_name = registerForm.cleaned_data['first_name']
-            user.last_name = registerForm.cleaned_data['last_name']
-            user.username = registerForm.cleaned_data['username']
-            user.email = registerForm.cleaned_data['email']
-            user.set_password(registerForm.cleaned_data['password'])
+        register_form = UserRegistrationForm(request.POST, request.FILES)
+        if register_form.is_valid():
+            user = register_form.save(commit=False)
+            user.username = register_form.cleaned_data['username']
+            user.email = register_form.cleaned_data['email']
+            user.name = register_form.cleaned_data['name']
+            user.set_password(register_form.cleaned_data['password'])
             user.is_active = False
             user.save()
             current_site = get_current_site(request)
@@ -73,12 +44,12 @@ def account_register(request):
                 },
             )
             user.email_user(subject=subject, message=message)
-            return render(request, 'accounts/registration/register_email_confirm.html', {'form': registerForm})
+            return render(request, 'accounts/registration/register_email_confirm.html', {'register_form': register_form})
         else:
-            return render(request, 'accounts/registration/register.html', {'form': registerForm})
+            return render(request, 'accounts/registration/register.html', {'register_form': register_form})
     else:
-        registerForm = UserRegistrationForm()
-    return render(request, 'accounts/registration/register.html', {'form': registerForm})
+        register_form = UserRegistrationForm()
+    return render(request, 'accounts/registration/register.html', {'register_form': register_form})
 
 
 def account_activate(request, uidb64, token):
@@ -94,6 +65,18 @@ def account_activate(request, uidb64, token):
         return redirect('accounts:dashboard')
     else:
         return render(request, 'accounts/registration/activation_invalid.html')
+
+
+class UpdatedLoginView(LoginView):
+    form_class = UserLoginForm
+
+    def form_valid(self, form):
+
+        remember_me = form.cleaned_data['remember_me']
+        if not remember_me:
+            self.request.session.set_expiry(0)
+            self.request.session.modified = True
+        return super(UpdatedLoginView, self).form_valid(form)
 
 
 def password_reset(request):
@@ -125,30 +108,45 @@ def password_reset(request):
     return render(request, 'accounts/password_reset/password_reset_form.html', {'form': passwordResetForm})
 
 
-def password_reset_token_confirm(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = UserModel.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, user.DoesNotExist):
-        user = None
-    if user is not None and password_reset_token.check_token(user, token):
-        # user.is_active = True
-        # user.save()
-        # login(request, user)
-        # return redirect('accounts:dashboard')
-        return render(request, 'accounts/password_reset/password_reset_form.html', {'user': uid})
-    else:
-        return render(request, 'accounts/registration/activation_invalid.html')
+@login_required
+def dashboard(request):
+
+    return render(request, 'accounts/dashboard/index.html', {})
 
 
-def password_edit(request, user):
+# @login_required
+# def user_articles(request, user_slug):
+#     pass
+
+
+# @login_required
+# def user_comments(request, user_slug):
+#     pass
+
+
+# @login_required
+# def user_reactions(request, user_reactions):
+#     pass
+
+
+@login_required
+def edit_details(request):
     if request.method == 'POST':
-        user = UserModel.objects.get(pk=id, user=request.user)
-        user_form = UserRegistrationForm(instance=user, data=request.POST)
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+
         if user_form.is_valid():
             user_form.save()
-            return HttpResponseRedirect(reverse('accounts:users'))
     else:
-        user = UserModel.objects.get(pk=id, user=request.user)
-        user_form = UserRegistrationForm(instance=user)
-    return render(request, 'accounts/dashboard/edit_users.html', {'form': user_form})
+        user_form = UserEditForm(instance=request.user)
+
+    return render(request, 'accounts/users/edit.html', {'user_form': user_form})
+
+
+@login_required
+def delete_user(request):
+    user = UserModel.objects.get(user_name=request.user)
+    user.is_active = False
+    user.deleted_at = datetime.now()
+    user.save()
+    logout(request)
+    return redirect('accounts:delete_confirmation')

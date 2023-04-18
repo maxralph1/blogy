@@ -11,12 +11,12 @@
                     <h4 class="card-title">Recent Articles on <span href="/" target="_blank" class="text-danger fw-bold">Blogy</span> Community</h4>
                     <div class="d-flex flex-column gap-2">
                         <div class="text-end">
-                            <a href="#" class="btn btn-sm btn-danger text-white"
+                            <a href="{% url 'posts:articles' %}" class="btn btn-sm btn-danger text-white"
                                 target="_blank">See More Articles
                             </a>
                         </div>
                         <div class="text-end">
-                            <a href="#" class="btn btn-sm btn-success d-md-none text-white"><i
+                            <a href="{% url 'posts:add_article' %}" class="btn btn-sm btn-success d-md-none text-white"><i
                             class="fa fa-plus-square"></i> Add Article
                             </a>
                         </div>
