@@ -91,7 +91,7 @@ class CommentForm(forms.ModelForm):
         )
         self.fields['body'].widget.attrs.update(
             {'type': 'text', 'name': 'body', 'id': 'body',
-                'class': 'form-control', 'placeholder': 'Write your comment', 'required': 'required'}
+                'class': 'form-control', 'placeholder': 'Write your comment (maximum of 255 letters/spaces)', 'required': 'required'}
         )
 
 

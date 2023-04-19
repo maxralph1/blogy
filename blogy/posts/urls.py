@@ -20,16 +20,13 @@ urlpatterns = [
     # Articles
     path('articles/', views.articles, name='articles'),
     path('articles/<int:page>', views.articles_pages, name='articles_pages'),
-    #     path(
-    #         "terms/<int:page>",
-    #         views.listing,
-    #         name="terms-by-page"
-    #     ),
     path('articles/add/', views.add_article, name='add_article'),
     path('articles/<slug:article_slug>/',
          views.view_article, name='view_article'),
     path('articles/<slug:article_slug>/update/',
          views.update_article, name='update_article'),
+    path('articles/<slug:article_slug>/featured/',
+         views.set_as_featured_article, name='set_as_featured_article'),
     path('articles/<slug:article_slug>/delete/',
          views.delete_article, name='delete_article'),
 
@@ -42,7 +39,9 @@ urlpatterns = [
 
     # Articles
     path('comments/', views.comments, name='comments'),
-    path('comments/add/', views.add_comment, name='add_comment'),
+    path('comments/<int:page>', views.comments_pages, name='comments_pages'),
+    path('articles/<slug:article_slug>/comments/add/',
+         views.add_comment, name='add_comment'),
     path('comments/<slug:comment_slug>/',
          views.view_comment, name='view_comment'),
     path('comments/<slug:comment_slug>/update/',

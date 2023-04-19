@@ -1,0 +1,101 @@
+{% extends 'dashboard/base.html' %}
+
+{% load static %}
+
+{% block main %}
+
+    <div class="row">
+        <section class="col-lg-8">
+            {% if messages %}
+                {% for message in messages  %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <strong>{{ message|safe }}</strong>. 
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <div class="card">
+                <div class="comment-section">
+                    <div class="card-body d-flex justify-content-between flex-wrap row-gap-2 border-bottom">
+                        <div class="d-flex flex-column ms-2">
+                            <h4 class="card-title">{{ comment.title|title }}</h4>
+                            {% if comment.added_by == request.user %}
+                            <div class="d-flex gap-3">
+                                <a href="{% url 'posts:update_article' comment.slug %}"><i class="ti-pencil-alt text-warning"></i></a>
+                                <a href="{% url 'posts:delete_article' comment.slug %}"><i class="ti-trash text-secondary"></i></a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-column ms-2">
+                            <span class="text-muted fst-italic">Added since {{ comment.created_at }}</span>
+                            {% if added_by != request.user %}
+                            <span class="text-muted fst-italic">by <a href="{% url 'posts:view_author' comment.added_by.username %}" class="text-decoration-none text-muted">{{ comment.added_by.name }}</a></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="comment-widgets scrollable">
+                        <div class="d-flex flex-row comment-row">
+                            <div class="comment-text active w-100">
+                                <span class="m-b-15 d-block">{{ comment.body }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-section mt-5 text-end">
+                    <div class="card-body d-flex justify-content-between flex-wrap row-gap-2">
+                        <div class="d-flex flex-column align-items-end ms-2">
+                            <p class="fst-italic fs-6 text-muted">Commented on ...</p>
+                            <h4 class="card-title fst-italic">{{ comment.article.title|title }}</h4>
+                            <span class="text-muted fst-italic">Added since {{ comment.article.created_at }}</span>
+                            {% if commment.article.added_by.username != user.get_username %}
+                                <span class="text-muted fst-italic">by <a href="{% url 'posts:view_author' comment.article.added_by.username %}" class="text-decoration-none text-muted">{{ comment.article.added_by.name }}</a></span>
+                            {% endif %}
+
+                            {% if comment.article.added_by == request.user %}
+                                <div class="d-flex gap-3 mt-2">
+                                    <a href="{% url 'posts:update_article' comment.article.slug %}"><i class="ti-pencil-alt text-warning"></i></a>
+                                    <a href="{% url 'posts:delete_article' comment.article.slug %}"><i class="ti-trash text-secondary"></i></a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="comment-widgets scrollable">
+                        <div class="d-flex flex-row comment-row">
+                            <div class="comment-text active w-100">
+                                <span class="m-b-15 d-block fst-italic">{{ comment.article.body|safe }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Feeds</h4>
+                    <div class="feed-widget">
+                        <ul class="list-style-none feed-body m-0 p-b-20">
+                            <li class="feed-item">
+                                <div class="feed-icon bg-info"><i class="far fa-bell"></i></div> You have 4
+                                pending tasks. <span class="ms-auto font-12 text-muted">Just Now</span>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon bg-success"><i class="ti-server"></i></div> Server #1
+                                overloaded.<span class="ms-auto font-12 text-muted">2 Hours ago</span>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon bg-warning"><i class="ti-shopping-cart"></i></div> New
+                                order received.<span class="ms-auto font-12 text-muted">31 May</span>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon bg-danger"><i class="ti-user"></i></div> New user
+                                registered.<span class="ms-auto font-12 text-muted">30 May</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}

@@ -117,12 +117,14 @@ def articles(request):
         articles = Article.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
 
-    paginator = Paginator(articles, per_page=2)
+    articles_count = articles.count()
+    paginator = Paginator(articles, per_page=10)
     article_objects = paginator.get_page(1)
     article_objects.adjusted_elided_pages = paginator.get_elided_page_range(1)
 
     return render(request, 'posts/articles/index.html', {
         'articles': articles,
+        'articles_count': articles_count,
         "article_objects": article_objects
     })
 
@@ -148,7 +150,7 @@ def articles_pages(request, page=1):
         articles = Article.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
 
-    paginator = Paginator(articles, per_page=2)
+    paginator = Paginator(articles, per_page=10)
     article_objects = paginator.get_page(page)
     article_objects.adjusted_elided_pages = paginator.get_elided_page_range(
         page)
@@ -191,12 +193,15 @@ def add_article(request):
 
 @login_required
 def view_article(request, article_slug):
-    if request.user.is_staff:
-        article = get_object_or_404(
-            Article, slug=article_slug, is_active=True)
-    else:
-        article = get_object_or_404(
-            Article, slug=article_slug, added_by=request.user, is_active=True)
+    # if request.user.is_staff:
+    #     article = get_object_or_404(
+    #         Article, slug=article_slug, is_active=True)
+    # else:
+    #     article = get_object_or_404(
+    #         Article, slug=article_slug, added_by=request.user, is_active=True)
+
+    article = get_object_or_404(
+        Article, slug=article_slug, is_active=True)
 
     comments_belonging_to_article = Comment.objects.filter(
         article=article, is_active=True).order_by('-updated_at')
@@ -209,10 +214,14 @@ def view_article(request, article_slug):
 
 @login_required
 def update_article(request, article_slug):
-    article = Article.objects.get(
-        slug=article_slug, added_by=request.user, is_active=True)
+    if request.user.is_staff:
+        article = get_object_or_404(
+            Article, slug=article_slug, is_active=True)
+    else:
+        article = get_object_or_404(
+            Article, slug=article_slug, added_by=request.user, is_active=True)
 
-    if request.method == 'POST' and article.added_by == request.user:
+    if (request.method == 'POST' and article.added_by == request.user) | (request.method == 'POST' and request.user.is_staff):
         article_form = ArticleForm(instance=article, data=request.POST)
         if article_form.is_valid():
             article_form.save()
@@ -228,11 +237,24 @@ def update_article(request, article_slug):
 
 
 @login_required
-def delete_article(request, article_slug):
-    article = get_object_or_404(
-        Article, slug=article_slug, added_by=request.user, is_active=True)
+def set_as_featured_article(request, article_slug):
+    Article.objects.filter(is_featured=True).update(is_featured=False)
+    Article.objects.filter(article__slug=article_slug,
+                           is_featured=False).update(is_featured=True)
 
-    if article.added_by != request.user:
+    return HttpResponseRedirect(reverse('posts:articles'))
+
+
+@login_required
+def delete_article(request, article_slug):
+    if request.user.is_staff:
+        article = get_object_or_404(
+            Article, slug=article_slug, is_active=True)
+    else:
+        article = get_object_or_404(
+            Article, slug=article_slug, added_by=request.user, is_active=True)
+
+    if (article.added_by != request.user) | request.user.is_staff == False:
         messages.warning(
             request, 'You do not have permissions to remove ' + article.title + '.')
 
@@ -246,6 +268,8 @@ def delete_article(request, article_slug):
     return HttpResponseRedirect(reverse('posts:articles'))
 
 
+# Authors
+
 @login_required
 def authors(request):
     if request.user.is_staff:
@@ -256,10 +280,9 @@ def authors(request):
 
 
 @login_required
-def view_author(request, author_slug):
-    if request.user.is_staff:
-        author = get_object_or_404(
-            UserModel, slug=author_slug, is_active=True)
+def view_author(request, username):
+    author = get_object_or_404(
+        UserModel, username=username, is_active=True)
 
     return render(request, 'posts/authors/author.html', {
         'author': author
@@ -267,10 +290,10 @@ def view_author(request, author_slug):
 
 
 @login_required
-def delete_author(request, author_slug):
+def delete_author(request, username):
     if request.user.is_staff:
         author = get_object_or_404(
-            UserModel, slug=author_slug, added_by=request.user, is_active=True)
+            UserModel, username=username, added_by=request.user, is_active=True)
 
         author.is_active = False
         author.deleted_at = datetime.now()
@@ -285,80 +308,172 @@ def delete_author(request, author_slug):
 
 @login_required
 def comments(request):
+    # my comments on other authors' articles
     if request.user.is_staff:
-        comments = Comment.objects.filter(
+        comments_by_me = Comment.objects.filter(
             is_active=True).order_by('-updated_at')
+
     else:
-        comments = Comment.objects.filter(
+        comments_by_me = Comment.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
 
-    paginator = Paginator(comments, per_page=2)
-    comment_objects = paginator.get_page(1)
-    comment_objects.adjusted_elided_pages = paginator.get_elided_page_range(1)
+    paginator = Paginator(comments_by_me, per_page=5)
+    comments_by_me_objects = paginator.get_page(1)
+    comments_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        1)
 
+    # comments by others on my articles
+    comments_by_others_on_my_articles = Comment.objects.filter(
+        article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(comments_by_others_on_my_articles, per_page=5)
+    comments_by_others_on_my_articles_objects = paginator.get_page(1)
+    comments_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        1)
+
+    # if comments_by_others_on_my_articles.count() > comments_by_me.count():
+    #     comment_objects = comments_by_others_on_my_articles_objects
+    # elif comments_by_me.count() > comments_by_others_on_my_articles.count():
+    #     comment_objects = comment_by_me_objects
+
+    # comment_objects = max(comments_by_others_on_my_articles_objects.count(), comment_by_me_objects.count())
+
+    # general render
     return render(request, 'posts/comments/index.html', {
         'comments': comments,
-        "comment_objects": comment_objects
+        # "comment_objects": comment_objects,
+        'comments_by_me_objects': comments_by_me_objects,
+        'comments_by_others_on_my_articles_objects': comments_by_others_on_my_articles_objects
+    })
+
+
+@login_required
+def comments_pages(request, page=1):
+    # my comments on other authors' articles
+    if request.user.is_staff:
+        comments_by_me = Comment.objects.filter(
+            is_active=True).order_by('-updated_at')
+
+    else:
+        comments_by_me = Comment.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(comments_by_me, per_page=2)
+    comments_by_me_objects = paginator.get_page(page)
+    comments_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        page)
+
+    # comments by others on my articles
+    comments_by_others_on_my_articles = Comment.objects.filter(
+        article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(comments_by_others_on_my_articles, per_page=5)
+    comments_by_others_on_my_articles_objects = paginator.get_page(page)
+    comments_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        page)
+
+    # if comments_by_others_on_my_articles.count() > comments_by_me.count():
+    #     comment_objects = comments_by_others_on_my_articles_objects.adjusted_elided_pages
+    # elif comments_by_me.count() > comments_by_others_on_my_articles.count():
+    #     comment_objects = comment_by_me_objects.adjusted_elided_pages
+
+    # comment_objects = max(comments_by_others_on_my_articles_objects.count(), comment_by_me_objects.count())
+
+    # general render
+    return render(request, 'posts/comments/index.html', {
+        'comments': comments,
+        # "comment_objects": comment_objects,
+        'comments_by_me_objects': comments_by_me_objects,
+        'comments_by_others_on_my_articles_objects': comments_by_others_on_my_articles_objects
     })
 
 
 @login_required
 def add_comment(request, article_slug):
-    if request.method == 'POST':
-        article = Article.objects.get(
-            article__slug=article_slug, is_active=True)
+    article = get_object_or_404(
+        Article, slug=article_slug, is_active=True)
 
+    if request.method == 'POST':
         comment_form = CommentForm(request.POST)
 
         if comment_form.is_valid():
+
             comment = comment_form.save(commit=False)
             comment.title = comment_form.cleaned_data['title']
             comment.slug = slugify(
                 comment.title + str(article_slug) + str(datetime.now()), allow_unicode=False
             )
             comment.body = comment_form.cleaned_data['body']
-            comment.article = article.id
+            comment.article = article
             comment.added_by = request.user
             comment.save()
 
             messages.success(request, comment.title + ' added')
 
+            return redirect('posts:view_article', article_slug)
+
     else:
         comment_form = CommentForm()
 
-    return render(request, 'posts/articles/article.html', {'comment_form': comment_form})
+    return render(request, 'posts/comments/add.html', {
+        'comment_form': comment_form,
+        'article': article
+    })
 
 
 @login_required
 def view_comment(request, comment_slug):
     comment = get_object_or_404(
-        comment, slug=comment_slug, added_by=request.user, is_active=True)
+        Comment, slug=comment_slug, is_active=True)
 
     return render(request, 'posts/comments/comment.html', {'comment': comment})
 
 
 @login_required
 def update_comment(request, comment_slug):
-    if request.method == 'POST':
-        comment = Comment.objects.get(added_by=request.user, slug=comment_slug)
-        comment_form = CommentForm(instance=comment, data=request.POST)
+    if request.user.is_staff:
+        comment = get_object_or_404(
+            Comment, slug=comment_slug, is_active=True)
+    else:
+        comment = get_object_or_404(
+            Comment, slug=comment_slug, added_by=request.user, is_active=True)
 
+    if (request.method == 'POST' and comment.added_by == request.user) | (request.method == 'POST' and request.user.is_staff):
+        comment_form = CommentForm(instance=comment, data=request.POST)
         if comment_form.is_valid():
             comment_form.save()
-            return HttpResponseRedirect(reverse('post:articles'))
+            return HttpResponseRedirect(reverse('posts:comments'))
+
+    else:
+        comment_form = CommentForm(instance=comment)
+
+    return render(request, 'posts/comments/edit.html', {
+        'comment': comment,
+        'comment_form': comment_form
+    })
 
 
 @login_required
 def delete_comment(request, comment_slug):
-    comment = get_object_or_404(
-        Comment, slug=comment_slug, added_by=request.user, is_active=True)
-    comment.is_active = False
-    comment.deleted_at = datetime.now()
-    comment.save()
+    if request.user.is_staff:
+        comment = get_object_or_404(
+            Comment, slug=comment_slug, is_active=True)
+    else:
+        comment = get_object_or_404(
+            Comment, slug=comment_slug, added_by=request.user, is_active=True)
 
-    messages.success(request, 'Comment removed')
+    if (comment.added_by != request.user) | request.user.is_staff == False:
+        messages.warning(
+            request, 'You do not have permissions to remove ' + comment.title + '.')
 
-    return redirect('accounts:dashboard')
+    else:
+        comment.is_active = False
+        comment.deleted_at = datetime.now()
+        comment.save()
+
+        messages.success(request, 'Comment' + comment.title + ' removed')
+
+    return HttpResponseRedirect(reverse('posts:comments'))
 
 
 # Reactions

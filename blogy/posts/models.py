@@ -50,6 +50,11 @@ class Topic(models.Model):
 
 
 class Article(models.Model):
+    is_featured = models.BooleanField(
+        verbose_name=_('Make article appear on index page'),
+        help_text=_('Change make article appear on index page'),
+        default=False,
+    )
     title = models.CharField(
         verbose_name=_('Article Title'),
         help_text=_('Required, unique and 20 charcters maximum'),
@@ -102,8 +107,7 @@ class Comment(models.Model):
     title = models.CharField(
         verbose_name=_('Comment Title'),
         help_text=_('Required and unique'),
-        max_length=255,
-        unique=True,
+        max_length=255
     )
     slug = models.SlugField(
         verbose_name=_(
@@ -112,8 +116,7 @@ class Comment(models.Model):
         unique=True)
     body = models.TextField(
         verbose_name=_('Body'),
-        max_length=255,
-        unique=True,
+        max_length=255
     )
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)

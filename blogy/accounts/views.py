@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserRegistrationForm, UserLoginForm, CustomPasswordResetForm, UserEditForm
 from .models import UserModel
+from posts.models import Article, Comment
 from .tokens import account_activation_token, password_reset_token
 
 
@@ -110,8 +111,24 @@ def password_reset(request):
 
 @login_required
 def dashboard(request):
+    articles = Article.objects.filter(
+        is_active=True).order_by('-updated_at')[:10]
 
-    return render(request, 'accounts/dashboard/index.html', {})
+    my_articles = Article.objects.filter(
+        added_by=request.user, is_active=True).order_by('-updated_at')[:10]
+
+    comments_by_me = Comment.objects.filter(
+        added_by=request.user, is_active=True).order_by('-updated_at')[:4]
+
+    comments_by_others_on_my_articles = Comment.objects.filter(
+        article__added_by=request.user).order_by('-updated_at')[:4]
+
+    return render(request, 'accounts/dashboard/index.html', {
+        'articles': articles,
+        'my_articles': my_articles,
+        'comments_by_me': comments_by_me,
+        'comments_by_others_on_my_articles': comments_by_others_on_my_articles
+    })
 
 
 # @login_required
