@@ -83,7 +83,7 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
-    about_me = models.CharField(
+    about_me = models.TextField(
         _('About me'),
         max_length=100,
         null=True,

@@ -12,7 +12,7 @@ from django.utils.text import slugify
 
 from accounts.models import UserModel
 from posts.models import Topic, Article, Comment, Reaction
-from posts.forms import CommentForm
+from posts.forms import CommentForm, ReactionForm
 
 
 def index(request):
@@ -310,4 +310,77 @@ def author(request, username):
         'articles_count': articles_count,
         'comments_count': comments_count,
         'reactions_count': reactions_count
+    })
+
+
+# def reaction_on_article(request, article_slug, reaction):
+
+#     Reaction.objects.filter(
+#     product__slug=product_slug, is_product_default=True).update(is_product_default=False)
+
+#     Reaction.objects.filter(
+#         slug=product_unit_slug, product__slug=product_slug, is_product_default=False).update(is_product_default=True)
+
+
+#     return redirect('inventory:view_product', product_slug)
+
+    # article = Article.objects.get(slug=article_slug)
+    # reaction_exists = Reaction.objects.filter(
+    #     article__slug=article_slug, added_by=request.user, is_active=True).exists()
+
+    #     reaction.type = reaction
+    #     reaction.slug = slugify(
+    #                 str(reaction.type) + str(article) + str(datetime.now()), allow_unicode=False)
+    #             reaction.added_by = request.user
+
+    #             reaction.save()
+
+    #             messages.success(
+    #                 request, 'You reacted to this article')
+    #             return redirect('pages:article', article_slug)
+    #         else:
+    #             return HttpResponse('Error handler content', status=400)
+
+    # return render(request, 'pages/article.html', {
+    #     'article': article,
+    #     'reaction_form': reaction_form
+    # })
+
+
+def reaction_on_article(request, article_slug):
+    article = Article.objects.get(slug=article_slug)
+    reaction_exists = Reaction.objects.filter(
+        article__slug=article_slug, added_by=request.user, is_active=True).exists()
+
+    reaction_form = ReactionForm()
+
+    if request.method == 'POST':
+        if reaction_exists:
+            reaction_form = ReactionForm(instance=reaction, data=request.POST)
+            if reaction_form.is_valid():
+                reaction_form.save()
+
+                return redirect('pages:article', article_slug)
+
+        else:
+            reaction_form = ReactionForm(request.POST)
+
+            if reaction_form.is_valid():
+                reaction = reaction_form.save(commit=False)
+                reaction.type = request.POST['type']
+                reaction.slug = slugify(
+                    str(reaction.type) + str(article) + str(datetime.now()), allow_unicode=False)
+                reaction.added_by = request.user
+
+                reaction.save()
+
+                messages.success(
+                    request, 'You reacted to this article')
+                return redirect('pages:article', article_slug)
+            else:
+                return HttpResponse('Error handler content', status=400)
+
+    return render(request, 'pages/article.html', {
+        'article': article,
+        'reaction_form': reaction_form
     })

@@ -1,6 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block styles %}
+    <style>
+        .reaction input {
+        display: none;
+        }
+
+        .reaction {
+        /* margin: 50px auto; */
+        display: table;
+        width: 30px;
+        }
+
+        .reaction-input {
+            display: flex;
+            justify-content: end;
+            gap: 1;
+            flex-direction: row-reverse;
+        }
+
+        .reaction label {
+        padding: 10px;
+        float: right;
+        font-size: 20px;
+        color: #eee;
+        }
+
+        .reaction label:hover {
+            cursor: pointer;
+        }
+
+        .reaction input:not(:checked)~label:hover,
+        .reaction input:not(:checked)~label:hover~label {
+        color: #ffc107;
+        }
+
+        .reaction input:checked~label:before {
+        color: red !important;
+        }
+    </style>
+{% endblock %}
+
 {% block title %}Article {{ article.title }}{% endblock %}
 
 {% block hero %}
@@ -37,22 +78,76 @@
                     {{ article.body|safe }}
                 </section>
 
-                <section class="comments-likes d-flex justify-content-between mt-5">
+                <section class="comments-likes d-flex justify-content-between mt-5 mb-3 position-relative">
                     <p class="text-danger">
                         {% if comments_count < 2 %}
                             {{ comments_count }} comment
                         {% else %}
                             {{ comments_count }} comments
                         {% endif %}
+                        &nbsp;&nbsp;&nbsp; <a href="#comment_form" class="text-danger fw-bold">Add a comment</a>
                     </p>
-                    <p class="text-danger">100 reactions</p>
+                    <p class="text-danger">
+                        100 reactions 
+                        &nbsp;&nbsp;&nbsp; <a id="reaction-emoji" class="text-danger fw-bold">Like 👍</a>
+                    </p>
+
+                    <div id="reaction" class="position-absolute d-flex justify-content-end w-100 reaction">
+                        <div class="w-75 py-4 card border border-secondary border-rounded bg-white text-center d-flex justify-content-around flex-row gap-2 flex-wrap reaction-input">
+                            <!-- <a href="{% url 'pages:reaction_on_article' article.slug %}" style="transform: scale(2);">👍</a>
+                            <a style="transform: scale(2);">😍</a>
+                            <a style="transform: scale(2);">😂</a>
+                            <a style="transform: scale(2);">😮</a>
+                            <a style="transform: scale(2);">😡</a>
+                            <a style="transform: scale(2);">😢</a> -->
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="like" value="like">
+                                    <label for="like"style="transform: scale(1.75);">👍
+                                    </label>
+                            </form>
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="love" value="love">
+                                    <label for="love"style="transform: scale(1.75);">😍
+                                    </label>
+                            </form>
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="laugh" value="laugh">
+                                    <label for="laugh"style="transform: scale(1.75);">😂   
+                                    </label>
+                            </form>
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="surprised" value="surprised">
+                                    <label for="surprised"style="transform: scale(1.75);">😮     
+                                    </label>
+                            </form>
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="angry" value="angry">
+                                    <label for="angry"style="transform: scale(1.75);">😡    
+                                    </label>
+                            </form>
+                            <form action="{% url 'pages:reaction_on_article' article.slug %}" method="POST">
+                                {% csrf_token %}
+                                    <input type="radio" name="rating" id="sad" value="sad">
+                                    <label for="sad"style="transform: scale(1.75);">😢    
+                                    </label>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="star-rating">
+                        <div class="star-input">
+                            
+                        </div>
+                    </div>
+                    
                 </section>
 
-                <section class="my-3 ms-1">
-                    <a href="#comment_form" class="text-danger fw-bold">Add a comment</a>
-                </section>
-
-                <section id="comment_form" class="comment_form">
+                <section id="comment_form" class="comment_form pt-3">
                     <form action="{% url 'pages:article' article.slug %}" method="POST">
                         {% csrf_token %}
                         {% if form.errors %}

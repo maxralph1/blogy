@@ -139,12 +139,12 @@ class Comment(models.Model):
 
 class Reaction(models.Model):
     REACTION_CHOICES = [
-        ('LIKE', '👍'),
-        ('LOVE', '😍'),
-        ('LAUGH', '😂'),
-        ('SURPRISED', '😮'),
-        ('ANGRY', '😡'),
-        ('SAD', '😢'),
+        ('like', '👍'),
+        ('love', '😍'),
+        ('laugh', '😂'),
+        ('surprised', '😮'),
+        ('angry', '😡'),
+        ('sad', '😢'),
     ]
 
     type = models.CharField(

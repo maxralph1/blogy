@@ -276,7 +276,7 @@ def authors(request):
         authors = UserModel.objects.filter(
             is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/authors/index.html', {'authors': authors})
+    return render(request, 'posts/authors/index.html', {})
 
 
 @login_required
@@ -358,7 +358,7 @@ def comments_pages(request, page=1):
         comments_by_me = Comment.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
 
-    paginator = Paginator(comments_by_me, per_page=2)
+    paginator = Paginator(comments_by_me, per_page=5)
     comments_by_me_objects = paginator.get_page(page)
     comments_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
         page)
@@ -480,7 +480,84 @@ def delete_comment(request, comment_slug):
 
 @login_required
 def reactions(request):
-    pass
+    # my comments on other authors' articles
+    if request.user.is_staff:
+        reactions_by_me = Reaction.objects.filter(
+            is_active=True).order_by('-updated_at')
+
+    else:
+        reactions_by_me = Reaction.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(reactions_by_me, per_page=5)
+    reactions_by_me_objects = paginator.get_page(1)
+    reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        1)
+
+    # reactions by others on my articles
+    reactions_by_others_on_my_articles = Reaction.objects.filter(
+        article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
+    reactions_by_others_on_my_articles_objects = paginator.get_page(1)
+    reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        1)
+
+    # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
+    #     reaction_objects = reactions_by_others_on_my_articles_objects
+    # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
+    #     reaction_objects = reaction_by_me_objects
+
+    # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
+
+    # general render
+    return render(request, 'posts/reactions/index.html', {
+        'reactions': reactions,
+        # "reaction_objects": reaction_objects,
+        'reactions_by_me_objects': reactions_by_me_objects,
+        'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
+    })
+
+
+@login_required
+def reactions_pages(request, page=1):
+    # my reactions on other authors' articles
+    if request.user.is_staff:
+        reactions_by_me = Reaction.objects.filter(
+            is_active=True).order_by('-updated_at')
+
+    else:
+        reactions_by_me = Reaction.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(reactions_by_me, per_page=2)
+    reactions_by_me_objects = paginator.get_page(page)
+    reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        page)
+
+    # reactions by others on my articles
+    reactions_by_others_on_my_articles = Reaction.objects.filter(
+        article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
+    reactions_by_others_on_my_articles_objects = paginator.get_page(page)
+    reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        page)
+
+    # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
+    #     reaction_objects = reactions_by_others_on_my_articles_objects.adjusted_elided_pages
+    # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
+    #     reaction_objects = reaction_by_me_objects.adjusted_elided_pages
+
+    # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
+
+    # general render
+    return render(request, 'posts/reactions/index.html', {
+        'reactions': reactions,
+        # "reaction_objects": reaction_objects,
+        'reactions_by_me_objects': reactions_by_me_objects,
+        'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
+    })
 
 
 @login_required

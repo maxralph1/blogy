@@ -30,6 +30,11 @@ urlpatterns = [
     path('authors/pages=<int:page>/',
          views.authors_pages, name='authors_pages'),
 
+    path('reaction-on-article/<slug:article_slug>/',
+         views.reaction_on_article, name='reaction_on_article'),
+    # path('reaction-on-article/<slug:article_slug>/<slug:reaction>/',
+    #      views.reaction_on_article, name='reaction_on_article'),
+
     path('about-us/', TemplateView.as_view(
         template_name='pages/about_us.html'), name='about_us')
 ]

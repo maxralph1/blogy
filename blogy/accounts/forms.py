@@ -122,8 +122,13 @@ class PasswordResetConfirmForm(SetPasswordForm):
 
 
 class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = UserModel
+        fields = ('username', 'email', 'name', 'photo', 'phone',
+                  'about_me', 'web', 'instagram', 'twitter',)
+
     username = forms.CharField(
-        label='Account username (cannot be changed)',
+        label='Account Username (cannot be changed)*',
         max_length=100,
         widget=forms.TextInput(
             attrs={'class': 'form-control', 'placeholder': 'e.g. abc123',
@@ -131,28 +136,88 @@ class UserEditForm(forms.ModelForm):
         )
     )
     email = forms.EmailField(
-        label='email',
-        min_length=2,
-        max_length=100,
+        label='Email',
         widget=forms.TextInput(
             attrs={'class': 'form-control',
                    'placeholder': 'e.g. john@doe.com', 'id': 'email'}
-        ))
+        )
+    )
     name = forms.CharField(
         label='Name',
-        min_length=2,
-        max_length=100,
         widget=forms.TextInput(
             attrs={'class': 'form-control',
                    'placeholder': 'e.g. John Doe', 'name': 'name', 'id': 'name'}
+        )
+    )
+    phone = forms.CharField(
+        label='Phone',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'e.g. +123456789', 'name': 'phone', 'id': 'phone'}
+        ))
+    photo = forms.CharField(
+        label='Photo',
+        widget=forms.TextInput(
+            attrs={'type': 'file', 'class': 'form-control',
+                   'placeholder': 'Upload your photo', 'name': 'photo', 'id': 'photo'}
+        ))
+    about_me = forms.CharField(
+        label='About Me',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'e.g. I am so so and so', 'name': 'about_me', 'id': 'about_me'}
+        ))
+    web = forms.CharField(
+        label='Web Address',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'e.g. http://johndoe.com/', 'name': 'web', 'id': 'web'}
+        ))
+    instagram = forms.CharField(
+        label='Instagram',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'e.g. http://instagram.com/johndoe/', 'name': 'instagram', 'id': 'instagram'}
+        ))
+    twitter = forms.CharField(
+        label='Twitter',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'e.g. http://twitter.com/johndoe/', 'name': 'twitter', 'id': 'twitter'}
         ))
 
-    class Meta:
-        model = UserModel
-        fields = ('username', 'email', 'name')
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        return username
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
-        self.fields['username'].required = True
-        self.fields['email'].required = True
-        self.fields['name'].required = True
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        return email
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        return name
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        return phone
+
+    def clean_photo(self):
+        photo = self.cleaned_data['photo']
+        return photo
+
+    def clean_about_me(self):
+        about_me = self.cleaned_data['about_me']
+        return about_me
+
+    def clean_web(self):
+        web = self.cleaned_data['web']
+        return web
+
+    def clean_instagram(self):
+        instagram = self.cleaned_data['instagram']
+        return instagram
+
+    def clean_twitter(self):
+        twitter = self.cleaned_data['twitter']
+        return twitter

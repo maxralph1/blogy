@@ -1,0 +1,137 @@
+{% extends 'dashboard/base.html' %}
+
+{% load static %}
+
+{% block main %}
+
+    <div class="row">
+        <section class="col-lg-4 col-xlg-3 col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <center class="m-t-30"> <img src="../../assets/images/users/5.jpg" class="rounded-circle" width="150">
+                        <h4 class="card-title m-t-10">{{ user.name }}</h4>
+                        <h6 class="card-subtitle">@{{ user.username }}</h6>
+                        <div class="row text-center justify-content-md-center">
+                            <div class="col-6"><a href="javascript:void(0)" class="link"><i class="icon-people"></i>
+                                    <font class="font-medium">{{ user.article_set.all.count }}</font>
+                                </a> Articles</div>
+                            <div class="col-6"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i>
+                                    <font class="font-medium">{{ user.comment_set.all.count }}</font>
+                                </a> Comments</div>
+                        </div>
+                    </center>
+                </div>
+                <div>
+                    <hr>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted p-t-30 db">About Me</small>
+                    <h6>{{ user.about_me }}</h6>
+                    <br>
+
+                    <small class="text-muted">Email address </small>
+                    <h6>{{ user.email }}</h6>
+
+                    <small class="text-muted p-t-30 db">Phone</small>
+                    <h6>{{ user.phone }}</h6>
+
+                    <small class="text-muted p-t-30 db">Social Profile</small>
+                    <br>
+                    <a href="{{ user.web }}" class="btn btn-circle btn-secondary"><i class="fa fa-globe"></i></a>
+                    <a href="{{ user.instagram }}" class="btn btn-circle btn-secondary"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ user.twitter }}" class="btn btn-circle btn-secondary"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-lg-8 col-xlg-9 col-md-7">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{% url 'accounts:profile' %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Error: Please try again!</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.username.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.username }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.email.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.name.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.phone.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.phone }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.photo.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.photo }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-md-12">{{ user_form.about_me.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.about_me }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                <label class="col-md-12">{{ user_form.web.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.web }}
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="col-md-12">{{ user_form.instagram.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.instagram }}
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="col-md-12">{{ user_form.twitter.label }}</label>
+                                <div class="col-md-12">
+                                    {{ user_form.twitter }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-danger text-white text-end">Update Profile</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
