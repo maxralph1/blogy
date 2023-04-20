@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Authors{% endblock %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    
+    {% block heading %}
+        <h2 class="pb-4 mb-4 fst-italic border-bottom">
+            Authors
+        </h2>
+    {% endblock %}
+
+
+    {% block main %}
+
+        <section>
+            {% if authors_objects %}
+                {% for author in authors_objects %}
+                    {% if author.is_staff != True %}
+                        <article class="blog-post row mb-4">
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                                        <div class="col-md-4">
+                                            <img src="
+                                                {% if article.image != 'images/default.png' %}
+                                                    {{ author.image.url }}
+                                                {% else %}
+                                                    
+                                                {% endif %}
+                                            " href="{% url 'pages:author' author.username %}" class="object-fit-cover img-fluid rounded-start" alt="" width="100%" height="100%">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title"><a href="{% url 'pages:author' author.username %}" class="text-dark">{{ author.name }}</a></h5>
+                                                <p class="card-title fw-bold fs-6 fst-italic">@<a href="{% url 'pages:author' author.username %}" class="text-dark">{{ author.username }}</a></p>
+                                                {% if author.about_me %}
+                                                    <p class="card-text"><a href="{% url 'pages:author' author.username %}" class="text-dark">{{ author.about_me|truncatewords:25 }}</a></p>
+                                                {% else %}
+                                                    <p class="card-text">(Author is yet to provide any information about them.)</p>
+                                                {% endif %}
+                                                
+                                                <p class="card-text"><small class="text-body-secondary">Joined {{ author.created_at }}</small></p>
+                                                <div class="activities d-flex justify-content-start gap-3">
+                                                    <a href="{% url 'pages:author' author.username %}#comments" class="text-danger">
+                                                        {% if author.comment_set.all.count < 2 %}
+                                                            {{ author.comment_set.all.count }} comment
+                                                        {% else %}
+                                                            {{ author.comment_set.all.count }} comments
+                                                        {% endif %}
+                                                    </a>
+                                                    <a class="text-danger">100 reactions</a>
+                                                    <a class="text-danger">100 reactions</a>
+                                                    <a class="text-danger">100 reactions</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                    <p class="text-center fs-5 my-4">There are no existing articles yet.</p>
+            {% endif %}
+        </section>
+
+        <section>
+            <nav class="blog-pagination" aria-label="Pagination">
+                {% if authors_objects.has_previous %}
+                    <a href="{% url 'pages:authors_pages' authors_objects.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
+                        Newer
+                    </a>
+                {% endif %}
+                {% if authors_objects.has_next %}
+                    <a href="{% url 'pages:authors_pages' authors_objects.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
+                        Older
+                    </a>
+                {% endif %}
+            </nav>
+        </section>
+
+    {% endblock %}
+
+
+{% endblock %}

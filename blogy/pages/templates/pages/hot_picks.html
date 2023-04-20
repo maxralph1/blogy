@@ -1,38 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Articles{% endblock %}
+{% block title %}Hot Picks{% endblock %}
 
 {% block hero %}
 
 {% endblock %}
 
 {% block content %}
-
-    <section id="comments" class="comments">
-        {% for comment in user.comment_set.all %}
-            <p>{{comment.title}}</p>
-            <p>{{comment.body}}</p>
-        {% empty %}
-            <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
-        {% endfor %}
-    </section>
-    <section id="comments" class="comments">
-        {% for comment in article.comment_set.all %}
-            <p>{{comment.title}}</p>
-            <p>{{comment.body}}</p>
-        {% empty %}
-            <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
-        {% endfor %}
-    </section>
-
-
-
-
     
     {% block heading %}
         <h2 class="pb-4 mb-4 fst-italic border-bottom">
-            Recent Articles
+            Hot Picks
         </h2>
     {% endblock %}
 
@@ -40,8 +19,8 @@
     {% block main %}
 
         <section>
-            {% if articles_objects %}
-                {% for article in articles_objects %}
+            {% if hot_articles %}
+                {% for article in hot_articles %}
                     <article class="blog-post row mb-4">
                         <div class="row mb-2">
                             <div class="col-md-12">
@@ -49,7 +28,7 @@
                                     <div class=" col p-4 d-flex flex-column position-static">
                                         <strong class="d-inline-block mb-2 text-{{ article.topic.representative_color }}">{{ article.topic.title }}</strong>
                                         <h3 class="mb-2">{{ article.title }}</h3>
-                                        <div class="mb-2 text-body-secondary">{{ article.created_at }}</div>
+                                        <div class="mb-2 text-body-secondary">Nov 11</div>
                                         <p class="mb-2">{{ article.body|safe }}</p>
                                         <a href="#" class="text-decoration-none text-secondary mb-2">by {{ article.added_by.name }}</a>
                                         <a href="{% url 'pages:article' article.slug %}" class="stretched-link text-danger">Continue reading</a>
@@ -79,19 +58,19 @@
                     </article>
                 {% endfor %}
             {% else %}
-                    <p class="text-center fs-5 my-4">There are no existing articles yet. <a href="{% url 'posts:add_article' %}" class="text-danger">Add One</a>.</p>
+                    <p class="text-center fs-5 my-4">There are no trending articles. <a href="{% url 'posts:add_article' %}" class="text-danger">Add One</a>.</p>
             {% endif %}
         </section>
 
         <section>
             <nav class="blog-pagination" aria-label="Pagination">
-                {% if articles_objects.has_previous %}
-                    <a href="{% url 'pages:articles_pages' articles_objects.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
+                {% if hot_articles.has_previous %}
+                    <a href="{% url 'pages:articles_pages' hot_articles.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
                         Newer
                     </a>
                 {% endif %}
-                {% if articles_objects.has_next %}
-                    <a href="{% url 'pages:articles_pages' articles_objects.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
+                {% if hot_articles.has_next %}
+                    <a href="{% url 'pages:articles_pages' hot_articles.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
                         Older
                     </a>
                 {% endif %}

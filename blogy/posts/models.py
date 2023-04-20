@@ -51,8 +51,8 @@ class Topic(models.Model):
 
 class Article(models.Model):
     is_featured = models.BooleanField(
-        verbose_name=_('Make article appear on index page'),
-        help_text=_('Change make article appear on index page'),
+        verbose_name=_('Make article Featured'),
+        help_text=_('Change make article featured on index(home) page'),
         default=False,
     )
     title = models.CharField(
@@ -101,6 +101,12 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    # def commented_on_recently(self):
+    #     # return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+    #     self.comment.created_at
+    #     now = timezone.now()
+    #     return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 
 class Comment(models.Model):

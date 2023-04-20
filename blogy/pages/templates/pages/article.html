@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Article {{ article.title }}{% endblock %}
+
 {% block hero %}
 
 {% endblock %}
@@ -8,79 +10,99 @@
 {% block content %}
     
     {% block heading %}
-        <h2 class="blog-post-title mb-3">
-            Sample blog post Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque culpa ab praesentium voluptatibus omnis laudantium numquam provident nemo! Perspiciatis, unde.
-        </h2>
-        <p class="blog-post-meta mb-5">January 1, 2021 by <a href="#" class="text-danger">Mark</a></p>
+        <section class="mb-3 fst-italic border-bottom">
+            <h2 class="blog-post-title">
+                {{ article.title }}
+            </h2>
+            <p class="blog-post-meta">{{ article.created_at }} by <a href="#" class="text-danger">{{ article.added_by.name }}</a></p>
+        </section>
     {% endblock %}
-
 
     {% block main %}
 
         <section>
 
             <article class="blog-post">
+                <section>
+                    <img src="
+                        {% if article.image != 'images/default.png' %}
+                            {{ article.image.url }}
+                        {% else %}
+                            
+                        {% endif %}
+                    " class="object-fit-cover rounded" alt="" width="100%" height="100%">
+                </section>
 
-                <p><img src="/images/boxed-water.jpg" alt="" width="100%" class="rounded"></p>
+                <section>
+                    {{ article.body|safe }}
+                </section>
 
-                <p>This blog post shows a few different types of content that’s supported and styled with Bootstrap. Basic typography, lists, tables, images, code, and more are all supported as expected.</p>
-                <hr>
-                <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
-                <h2>Blockquotes</h2>
-                <p>This is an example blockquote in action:</p>
-                <blockquote class="blockquote">
-                    <p>Quoted text goes here.</p>
-                </blockquote>
-                <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
-                <h3>Example lists</h3>
-                <p>This is some additional paragraph placeholder content. It's a slightly shorter version of the other highly repetitive body text used throughout. This is an example unordered list:</p>
-                <ul>
-                    <li>First list item</li>
-                    <li>Second list item with a longer description</li>
-                    <li>Third list item to close it out</li>
-                </ul>
-                <p>And this is an ordered list:</p>
-                <ol>
-                    <li>First list item</li>
-                    <li>Second list item with a longer description</li>
-                    <li>Third list item to close it out</li>
-                </ol>
-                <p>And this is a definition list:</p>
-                <dl>
-                    <dt>HyperText Markup Language (HTML)</dt>
-                    <dd>The language used to describe and define the content of a Web page</dd>
-                    <dt>Cascading Style Sheets (CSS)</dt>
-                    <dd>Used to describe the appearance of Web content</dd>
-                    <dt>JavaScript (JS)</dt>
-                    <dd>The programming language used to build advanced Web sites and applications</dd>
-                </dl>
-                <h2>Inline HTML elements</h2>
-                <p>HTML defines a long list of available inline tags, a complete list of which can be found on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">Mozilla Developer Network</a>.</p>
-                <ul>
-                    <li><strong>To bold text</strong>, use <code class="language-plaintext highlighter-rouge">&lt;strong&gt;</code>.</li>
-                    <li><em>To italicize text</em>, use <code class="language-plaintext highlighter-rouge">&lt;em&gt;</code>.</li>
-                    <li>Abbreviations, like <abbr title="HyperText Markup Language">HTML</abbr> should use <code class="language-plaintext highlighter-rouge">&lt;abbr&gt;</code>, with an optional <code class="language-plaintext highlighter-rouge">title</code> attribute for the full phrase.</li>
-                    <li>Citations, like <cite>— Mark Otto</cite>, should use <code class="language-plaintext highlighter-rouge">&lt;cite&gt;</code>.</li>
-                    <li><del>Deleted</del> text should use <code class="language-plaintext highlighter-rouge">&lt;del&gt;</code> and <ins>inserted</ins> text should use <code class="language-plaintext highlighter-rouge">&lt;ins&gt;</code>.</li>
-                    <li>Superscript <sup>text</sup> uses <code class="language-plaintext highlighter-rouge">&lt;sup&gt;</code> and subscript <sub>text</sub> uses <code class="language-plaintext highlighter-rouge">&lt;sub&gt;</code>.</li>
-                </ul>
-                <p>Most of these elements are styled by browsers with few modifications on our part.</p>
-                <h2>Heading</h2>
-                <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
-                <h3>Sub-heading</h3>
-                <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
-                <pre><code>Example code block</code></pre>
-                <p>This is some additional paragraph placeholder content. It's a slightly shorter version of the other highly repetitive body text used throughout.</p>
-
-                <div class="comments-likes d-flex justify-content-between">
-                    <p class="text-danger">20 comments</p>
+                <section class="comments-likes d-flex justify-content-between mt-5">
+                    <p class="text-danger">
+                        {% if comments_count < 2 %}
+                            {{ comments_count }} comment
+                        {% else %}
+                            {{ comments_count }} comments
+                        {% endif %}
+                    </p>
                     <p class="text-danger">100 reactions</p>
-                </div>
+                </section>
+
+                <section class="my-3 ms-1">
+                    <a href="#comment_form" class="text-danger fw-bold">Add a comment</a>
+                </section>
+
+                <section id="comment_form" class="comment_form">
+                    <form action="{% url 'pages:article' article.slug %}" method="POST">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Error: Please try again!</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-12">
+                                    {{ comment_form.title }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-12">
+                                    {{ comment_form.body }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-danger text-white text-end">Add Comment</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="comments" class="comments mt-5">
+                    <h3 class="text-danger fs-4 fst-italic text-end border-bottom">Comments</h3>
+                    <div class="d-flex flex-column gap-3">
+                        {% for comment in comments_belonging_to_article %}
+                            <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
+                                <span class="fw-bold">{{ comment.title }}</span>
+                                <span>{{ comment.body }}</span>
+                                <span class="fs-6">by <a href="{% url 'pages:author' comment.added_by.username %}" class="text-danger">{{ comment.added_by.name }}</a></span>
+                                <span>on {{ comment.created_at }}</span>
+                            </div>
+                            
+                        {% empty %}
+                            <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
+                        {% endfor %}
+                    </div>
+                </section>
             </article>
 
         </section>
 
     {% endblock %}
-
 
 {% endblock %}

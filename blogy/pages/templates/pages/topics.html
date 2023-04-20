@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Topics{% endblock %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    
+    {% block heading %}
+        <h2 class="pb-4 mb-4 fst-italic border-bottom">
+            Topics
+        </h2>
+    {% endblock %}
+
+
+    {% block main %}
+
+        <section>
+            {% if topics %}
+                {% for topic in topics %}
+                    <article class="blog-post row mb-4">
+                        <div class="row mb-2">
+                            <div class="col-md-12">
+                                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                                    <div class=" col p-4 d-flex flex-column position-static">
+                                        <strong class="d-inline-block mb-2 text-{{ article.topic.representative_color }}">{{ article.topic.title }}</strong>
+                                        <h3 class="mb-2">{{ topic.title }}</h3>
+                                        <div class="mb-2 text-body-secondary">Nov 11</div>
+                                        <p class="mb-2">{{ topic.description }}</p>
+                                        <a href="#" class="text-decoration-none text-secondary mb-2">by {{ topic.added_by.name }}</a>
+                                        <a href="{% url 'pages:topic' topic.slug %}" class="stretched-link text-danger">Continue reading</a>
+                                    </div>
+                                    <div class="comments-likes d-flex justify-content-between px-4 pb-4">
+                                        <a href="{% url 'pages:topic' topic.slug %}#comments" class="text-danger">
+                                            {% if topic.article_set.all.count < 2 %}
+                                                {{ topic.article_set.all.count }} article
+                                            {% else %}
+                                                {{ topic.article_set.all.count }} articles
+                                            {% endif %}
+                                        </a>
+                                        <a class="text-danger">100 reactions</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                    <p class="text-center fs-5 my-4">There are no existing topics yet. <a href="{% url 'posts:add_topic' %}" class="text-danger">Add One</a>.</p>
+            {% endif %}
+        </section>
+
+    {% endblock %}
+
+
+{% endblock %}

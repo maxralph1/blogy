@@ -5,15 +5,24 @@
     
     {% block heading %}
         <h2 class="pb-4 mb-4 fst-italic border-bottom">
-            About Blogy
+            About <span class="text-danger">Blogy<span class="text-dark">Social</span></span>
         </h2>
     {% endblock %}
 
 
     {% block main %}
 
+        <section>
 
+            <p>
+                <span class="text-danger">Blogy<span class="text-dark">Social</span></span> is a social media/blog website where people share their knowledge, experiences in all aspects of life. We are internet-based.
+            </p>
 
+            <p>
+                <a href="{% url 'accounts:register' %}" class="text-danger">Check us out today</a>.
+            </p>
+
+        </section>
 
     {% endblock %}
 

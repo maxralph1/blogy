@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Topic {{ topic.title }}{% endblock %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    
+    {% block heading %}
+        <section>
+            <h2 class="blog-post-title mb-3">
+                {{ topic.title }}
+            </h2>
+            <p class="blog-post-meta mb-5">{{ topic.created_at }} by <a href="#" class="text-danger">{{ topic.added_by.name }}</a></p>
+            </section>
+        
+    {% endblock %}
+
+    {% block main %}
+
+        <section>
+
+            <article class="blog-post">
+                <section>
+                    {{ topic.description }}
+                </section>
+
+                <section id="comments" class="comments-likes d-flex justify-content-between pt-5">
+                    <p class="text-danger">
+                        {% if articles_count < 2 %}
+                            {{ articles_count }} article
+                        {% else %}
+                            {{ articles_count }} articles
+                        {% endif %}
+                    </p>
+                    <p class="text-danger">100 reactions</p>
+                </section>
+
+                <section>
+
+                </section>
+            </article>
+
+        </section>
+
+    {% endblock %}
+
+{% endblock %}

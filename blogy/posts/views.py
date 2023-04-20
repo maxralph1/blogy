@@ -125,7 +125,7 @@ def articles(request):
     return render(request, 'posts/articles/index.html', {
         'articles': articles,
         'articles_count': articles_count,
-        "article_objects": article_objects
+        'article_objects': article_objects
     })
 
 

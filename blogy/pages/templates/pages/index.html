@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Home Page{% endblock %}
+
 {% block hero %}
     <div class="p-4 p-md-5 rounded text-bg-dark mt-3">
         <div class="col-md-6 px-0">
-            <span class="fst-italic">Featured post</span>
-            <h1 class="display-4 fst-italic">Title of a longer featured blog post</h1>
-            <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
-            <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
+            <span class="fst-italic">Featured article</span>
+            <h1 class="display-7 fst-italic">{{ featured_article.title|truncatewords:13 }}</h1>
+            <p class="lead my-3">{{ featured_article.body|truncatewords:23|safe }}</p>
+            <p class="lead mb-0"><a href="{% url 'pages:article' featured_article.slug %}" class="text-white fw-bold">Continue reading...</a></p>
         </div>
     </div>
 {% endblock %}
@@ -23,49 +25,47 @@
 
     {% block main %}
         <section>
-            <article class="blog-post row mb-2">
-                <div class="row mb-2">
-                    <div class="col-md-12">
-                        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style="height: 250px;">
-                            <div class=" col-md-7 p-4 d-flex flex-column position-static">
-                                <strong class="d-inline-block mb-2 text-success">Design</strong>
-                                <h3 class="mb-0">Post title Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolor, molestias!</h3>
-                                <!-- <div class="mb-1 text-body-secondary">Nov 11</div>
-                                <p class="mb-auto">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Veniam molestiae...</p> -->
-                                <a href="#" class="text-decoration-none text-secondary">by John Doe</a>
-                                <a href="#" class="stretched-link text-danger">Continue reading</a>
-                            </div>
-                            <div class="col-md-5 d-none d-lg-block" style="height: 100%">
-                                <img src="/images/boxed-water.jpg" alt="" width="100%" height="100%">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <article class="blog-post row mb-2">
-                <div class="row mb-2">
-                    <div class="col-md-12">
-                        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style="height: 250px;">
-                            <div class="col-md-7 p-4 d-flex flex-column position-static">
-                                <strong class="d-inline-block mb-2 text-success">Design</strong>
-                                <h3 class="mb-0">Post title Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolor, molestias!</h3>
-                                <!-- <div class="mb-1 text-body-secondary">Nov 11</div>
-                                <p class="mb-auto">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Veniam molestiae...</p> -->
-                                <a href="#" class="text-decoration-none text-secondary">by John Doe</a>
-                                <a href="#" class="stretched-link text-danger">Continue reading</a>
-                            </div>
-                            <div class="col-md-5 d-none d-lg-block" style="height: 100%">
-                                <img src="/images//elisa-jeanne.jpg" alt="" width="100%" height="100%">
+            {% if articles_objects %}
+                {% for article in articles_objects %}
+                    <article class="blog-post row mb-2">
+                        <div class="row mb-2">
+                            <div class="col-md-12">
+                                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style="height: 250px;">
+                                    <div class="col-md-7 p-4 d-flex flex-column position-static">
+                                        <strong class="d-inline-block mb-2 text-{{ article.topic.representative_color }}">{{ article.topic.title }}</strong>
+                                        <h3 class="mb-0">{{ article.title|truncatewords:13 }}</h3>
+                                        <a href="#" class="text-decoration-none text-secondary">by {{ article.added_by.name }}</a>
+                                        <a href="{% url 'pages:article' article.slug %}" class="stretched-link text-danger">Continue reading ...</a>
+                                    </div>
+                                    <div class="col-md-5 d-none d-lg-block" style="height: 100%">
+                                        <img src="
+                                            {% if article.image != 'images/default.png' %}
+                                                {{ article.image.url }}
+                                            {% else %}
+                                                
+                                            {% endif %}
+                                        " class="object-fit-cover" alt="" width="100%" height="100%">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </article>
+                    </article>
+                {% endfor %}
+            {% else %}
+                    <p class="text-center fs-5 my-4">There are no existing articles yet. <a href="{% url 'posts:add_article' %}" class="text-danger">Add One</a>.</p>
+            {% endif %}
 
             <nav class="blog-pagination" aria-label="Pagination">
-                <a class="btn btn-outline-secondary rounded-pill disabled">Newer</a>
-                <a class="btn btn-outline-danger rounded-pill" href="#">Older</a>
+                {% if articles_objects.has_previous %}
+                    <a href="{% url 'pages:index_pages' articles_objects.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
+                        Newer
+                    </a>
+                {% endif %}
+                {% if articles_objects.has_next %}
+                    <a href="{% url 'pages:index_pages' articles_objects.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
+                        Older
+                    </a>
+                {% endif %}
             </nav>
         </section>
     {% endblock %}
