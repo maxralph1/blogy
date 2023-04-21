@@ -137,23 +137,11 @@ class Comment(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
 
-class Reaction(models.Model):
-    REACTION_CHOICES = [
-        ('like', '👍'),
-        ('love', '😍'),
-        ('laugh', '😂'),
-        ('surprised', '😮'),
-        ('angry', '😡'),
-        ('sad', '😢'),
-    ]
-
-    type = models.CharField(
-        choices=REACTION_CHOICES,
-        verbose_name=_('Reaction Choices'),
-        help_text=_('Required'),
-        max_length=255,
-        null=True,
-        blank=True
+class Like(models.Model):
+    like_dislike = models.BooleanField(
+        verbose_name=_('Like/Dislike'),
+        help_text=_('Like/Dislike'),
+        default=True,
     )
     slug = models.SlugField(
         verbose_name=_(
@@ -189,3 +177,57 @@ class Reaction(models.Model):
         _('Created at'), auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+
+# class Reaction(models.Model):
+#     REACTION_CHOICES = [
+#         ('like', '👍'),
+#         ('love', '😍'),
+#         ('laugh', '😂'),
+#         ('surprised', '😮'),
+#         ('angry', '😡'),
+#         ('sad', '😢'),
+#     ]
+
+#     type = models.CharField(
+#         choices=REACTION_CHOICES,
+#         verbose_name=_('Reaction Choices'),
+#         help_text=_('Required'),
+#         max_length=255,
+#         null=True,
+#         blank=True
+#     )
+#     slug = models.SlugField(
+#         verbose_name=_(
+#             'Reaction safe URL'),
+#         max_length=255,
+#         unique=True
+#     )
+#     topic = models.ForeignKey(
+#         Topic,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         blank=True
+#     )
+#     article = models.ForeignKey(
+#         Article,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         blank=True
+#     )
+#     comment = models.ForeignKey(
+#         Comment,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         blank=True
+#     )
+#     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+#     is_active = models.BooleanField(
+#         verbose_name=_('Reaction visibility'),
+#         help_text=_('Change reaction visibility'),
+#         default=True,
+#     )
+#     created_at = models.DateTimeField(
+#         _('Created at'), auto_now_add=True, editable=False)
+#     updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
+#     deleted_at = models.DateTimeField(null=True, blank=True)

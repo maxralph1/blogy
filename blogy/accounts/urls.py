@@ -46,9 +46,11 @@ urlpatterns = [
         name='password_reset_complete',
     ),
 
+
     # User dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
+    path('profile-photo/', views.profile_photo, name='profile_photo'),
     path('profile/delete_user/', views.delete_user, name='delete_user'),
     path(
         'profile/delete_confirm/',

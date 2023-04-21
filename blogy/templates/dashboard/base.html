@@ -12,7 +12,7 @@
         <meta name="description"
             content="BlogySocial is an blog application">
         <meta name="robots" content="noindex,nofollow">
-        <title>BlogySocial | </title>
+        <title>BlogySocial | {% block title %} {% endblock %}</title>
         <!-- Favicon icon -->
         <link rel="icon" type="image/png" sizes="16x16" href="#">
         <!-- Styles -->
@@ -49,8 +49,8 @@
                             <div class="d-flex align-items-center">
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb fs-5">
-                                        <li class="breadcrumb-item"><a href="#" class="text-dark">Home</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">Library</li>
+                                        {% block breadcrumb %}
+                                        {% endblock %}
                                     </ol>
                                 </nav>
                             </div>

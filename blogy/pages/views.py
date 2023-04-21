@@ -11,8 +11,8 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from accounts.models import UserModel
-from posts.models import Topic, Article, Comment, Reaction
-from posts.forms import CommentForm, ReactionForm
+from posts.models import Topic, Article, Comment, Like
+from posts.forms import CommentForm
 
 
 def index(request):
@@ -206,7 +206,7 @@ def hot_picks(request):
     return render(request, 'pages/hot_picks.html', {'hot_articles': hot_articles})
 
 
-def search_articles(request):
+def search(request):
 
     if request.method == 'GET':
 
@@ -234,7 +234,7 @@ def search_articles(request):
     })
 
 
-def search_articles_pages(request, query, page=1):
+def search_pages(request, query, page=1):
 
     articles = Article.objects.filter(
         Q(title__icontains=query) |
@@ -292,24 +292,24 @@ def author(request, username):
     comments_by_author = Comment.objects.filter(
         added_by=author, is_active=True).order_by('-updated_at')
 
-    reactions_by_author = Reaction.objects.filter(
+    likes_by_author = Like.objects.filter(
         added_by=author, is_active=True).order_by('-updated_at')
 
     topics_count = topics_by_author.count()
     articles_count = articles_by_author.count()
     comments_count = comments_by_author.count()
-    reactions_count = reactions_by_author.count()
+    likes_count = likes_by_author.count()
 
     return render(request, 'pages/author.html', {
         'author': author,
         'topics_by_author': topics_by_author,
         'articles_by_author': articles_by_author,
         'comments_by_author': comments_by_author,
-        'reactions_by_author': reactions_by_author,
+        'likes_by_author': likes_by_author,
         'topics_count': topics_count,
         'articles_count': articles_count,
         'comments_count': comments_count,
-        'reactions_count': reactions_count
+        'likes_count': likes_count
     })
 
 
@@ -347,40 +347,40 @@ def author(request, username):
     # })
 
 
-def reaction_on_article(request, article_slug):
-    article = Article.objects.get(slug=article_slug)
-    reaction_exists = Reaction.objects.filter(
-        article__slug=article_slug, added_by=request.user, is_active=True).exists()
+# def reaction_on_article(request, article_slug):
+#     article = Article.objects.get(slug=article_slug)
+#     reaction_exists = Reaction.objects.filter(
+#         article__slug=article_slug, added_by=request.user, is_active=True).exists()
 
-    reaction_form = ReactionForm()
+#     reaction_form = ReactionForm()
 
-    if request.method == 'POST':
-        if reaction_exists:
-            reaction_form = ReactionForm(instance=reaction, data=request.POST)
-            if reaction_form.is_valid():
-                reaction_form.save()
+#     if request.method == 'POST':
+#         if reaction_exists:
+#             reaction_form = ReactionForm(instance=reaction, data=request.POST)
+#             if reaction_form.is_valid():
+#                 reaction_form.save()
 
-                return redirect('pages:article', article_slug)
+#                 return redirect('pages:article', article_slug)
 
-        else:
-            reaction_form = ReactionForm(request.POST)
+#         else:
+#             reaction_form = ReactionForm(request.POST)
 
-            if reaction_form.is_valid():
-                reaction = reaction_form.save(commit=False)
-                reaction.type = request.POST['type']
-                reaction.slug = slugify(
-                    str(reaction.type) + str(article) + str(datetime.now()), allow_unicode=False)
-                reaction.added_by = request.user
+#             if reaction_form.is_valid():
+#                 reaction = reaction_form.save(commit=False)
+#                 reaction.type = request.POST['type']
+#                 reaction.slug = slugify(
+#                     str(reaction.type) + str(article) + str(datetime.now()), allow_unicode=False)
+#                 reaction.added_by = request.user
 
-                reaction.save()
+#                 reaction.save()
 
-                messages.success(
-                    request, 'You reacted to this article')
-                return redirect('pages:article', article_slug)
-            else:
-                return HttpResponse('Error handler content', status=400)
+#                 messages.success(
+#                     request, 'You reacted to this article')
+#                 return redirect('pages:article', article_slug)
+#             else:
+#                 return HttpResponse('Error handler content', status=400)
 
-    return render(request, 'pages/article.html', {
-        'article': article,
-        'reaction_form': reaction_form
-    })
+#     return render(request, 'pages/article.html', {
+#         'article': article,
+#         'reaction_form': reaction_form
+#     })

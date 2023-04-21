@@ -13,7 +13,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
-from .forms import UserRegistrationForm, UserLoginForm, CustomPasswordResetForm, UserEditForm
+from .forms import UserRegistrationForm, UserLoginForm, CustomPasswordResetForm, UserEditForm, UserPhotoForm
 from .models import UserModel
 from posts.models import Article, Comment
 from .tokens import account_activation_token, password_reset_token
@@ -148,21 +148,47 @@ def dashboard(request):
 
 @login_required
 def profile(request):
-    user_form = UserEditForm()
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
+        userphoto_form = UserPhotoForm(
+            instance=request.user, data=request.FILES)
 
         if user_form.is_valid():
             user_form.save()
     else:
         user_form = UserEditForm(instance=request.user)
+        userphoto_form = UserPhotoForm(instance=request.user)
 
-    return render(request, 'accounts/users/profile.html', {'user_form': user_form})
+    return render(request, 'accounts/users/profile.html', {
+        'user_form': user_form,
+        'userphoto_form': userphoto_form
+    })
+
+
+@login_required
+def profile_photo(request):
+    if request.method == 'POST':
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+        userphoto_form = UserPhotoForm(
+            instance=request.user, data=request.FILES)
+
+        if userphoto_form.is_valid():
+            userphoto_form.save()
+
+            return HttpResponseRedirect(reverse('accounts:profile'))
+    else:
+        user_form = UserEditForm(instance=request.user)
+        userphoto_form = UserPhotoForm(instance=request.user)
+
+    return render(request, 'accounts/users/profile.html', {
+        'user_form': user_form,
+        'userphoto_form': userphoto_form
+    })
 
 
 @login_required
 def delete_user(request):
-    user = UserModel.objects.get(user_name=request.user)
+    user = UserModel.objects.get(username=request.user)
     user.is_active = False
     user.deleted_at = datetime.now()
     user.save()

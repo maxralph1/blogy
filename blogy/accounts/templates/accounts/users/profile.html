@@ -8,7 +8,13 @@
         <section class="col-lg-4 col-xlg-3 col-md-5">
             <div class="card">
                 <div class="card-body">
-                    <center class="m-t-30"> <img src="../../assets/images/users/5.jpg" class="rounded-circle" width="150">
+                    <center class="m-t-30"> <img src="
+                            {% if request.user.photo != 'images/default.png' %}
+                                {{ request.user.photo.url }}
+                            {% else %}
+                                {% static 'images/no-image.png' %}
+                            {% endif %}
+                        " class="rounded-circle" width="150">
                         <h4 class="card-title m-t-10">{{ user.name }}</h4>
                         <h6 class="card-subtitle">@{{ user.username }}</h6>
                         <div class="row text-center justify-content-md-center">
@@ -45,6 +51,30 @@
         </section>
 
         <section class="col-lg-8 col-xlg-9 col-md-7">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{% url 'accounts:profile_photo' %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Error: Please try again!</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="form-group col-md-8">
+                                <div class="col-md-12">
+                                    {{ userphoto_form.photo }}
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <button type="submit" class="btn btn-danger text-white text-end">Update Profile Photo</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-body">
                     <form action="{% url 'accounts:profile' %}" method="POST" enctype="multipart/form-data" class="form-horizontal form-material mx-2">
@@ -84,14 +114,6 @@
                                 <label class="col-md-12">{{ user_form.phone.label }}</label>
                                 <div class="col-md-12">
                                     {{ user_form.phone }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-12">
-                                <label class="col-md-12">{{ user_form.photo.label }}</label>
-                                <div class="col-md-12">
-                                    {{ user_form.photo }}
                                 </div>
                             </div>
                         </div>

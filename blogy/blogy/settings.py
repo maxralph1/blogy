@@ -20,7 +20,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'ckeditor',
     'pages.apps.PagesConfig',
     'accounts.apps.AccountsConfig',
     'posts.apps.PostsConfig',
@@ -30,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [

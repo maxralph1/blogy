@@ -47,7 +47,7 @@
                             <button class="nav-link text-danger fst-italic" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments-tab-pane" type="button" role="tab" aria-controls="comments-tab-pane" aria-selected="false">Comment{% if comments_count < 2 %} {% else %}s{% endif %} ({{ comments_count }})</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link text-danger fst-italic" id="reactions-tab" data-bs-toggle="tab" data-bs-target="#reactions-tab-pane" type="button" role="tab" aria-controls="reactions-tab-pane" aria-selected="false">Reaction{% if reactions_count < 2 %} {% else %}s{% endif %} ({{ reactions_count }})</button>
+                            <button class="nav-link text-danger fst-italic" id="likes-tab" data-bs-toggle="tab" data-bs-target="#likes-tab-pane" type="button" role="tab" aria-controls="likes-tab-pane" aria-selected="false">Like{% if likes_count < 2 %} {% else %}s{% endif %} ({{ likes_count }})</button>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
@@ -81,16 +81,16 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="reactions-tab-pane" role="tabpanel" aria-labelledby="reactions-tab" tabindex="0">
-                        {% for reaction in reactions_by_author %}
-                            {% if reaction.article %}
+                    <div class="tab-pane fade" id="likes-tab-pane" role="tabpanel" aria-labelledby="likes-tab" tabindex="0">
+                        {% for like in likes_by_author %}
+                            {% if like.article %}
                                 <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
                                     <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
                                     <span>{{ comment.body|truncatewords:45|safe }}</span>
                                     <span>on {{ comment.created_at }}</span>
                                     <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ comment.article.title|truncatewords:15 }}</a></span>
                                 </div>
-                            {% elif reaction.comment %}
+                            {% elif like.comment %}
                                 <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
                                     <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
                                     <span>{{ comment.body|truncatewords:45|safe }}</span>
@@ -99,7 +99,7 @@
                                 </div>
                             {% endif %}
                         {% empty %}
-                            <p class="text-center fs-5 my-4">There are no existing reactions yet by author.</p>
+                            <p class="text-center fs-5 my-4">There are no existing likes yet by author.</p>
                         {% endfor %}
                     </div>
                     </div>

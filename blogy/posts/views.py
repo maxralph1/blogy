@@ -10,9 +10,9 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from .models import Topic, Article, Comment, Reaction
+from .models import Topic, Article, Comment, Like
 from accounts.models import UserModel
-from .forms import TopicForm, ArticleForm, CommentForm, ReactionForm
+from .forms import TopicForm, ArticleForm, CommentForm
 
 
 # Topics
@@ -20,8 +20,6 @@ from .forms import TopicForm, ArticleForm, CommentForm, ReactionForm
 @login_required
 def topics(request):
     topics = Topic.objects.filter(is_active=True).order_by('-updated_at')
-    # topics = Topic.objects.filter(added_by=request.user,
-    #                               is_active=True).order_by('-updated_at')
 
     return render(request, 'posts/topics/index.html', {'topics': topics})
 
@@ -131,18 +129,6 @@ def articles(request):
 
 @login_required
 def articles_pages(request, page=1):
-    # articles = Article.objects.filter(
-    #     added_by=request.user, is_active=True).order_by('-updated_at')
-
-    # return render(request, 'posts/articles/index.html')
-    # # return render(request, 'posts/articles/index.html', {'articles': articles})
-
-    # topics = Topic.objects.filter(is_active=True).order_by('-updated_at')
-    # # topics = Topic.objects.filter(added_by=request.user,
-    # #                               is_active=True).order_by('-updated_at')
-
-    # return render(request, 'posts/topics/index.html', {'topics': topics})
-
     if request.user.is_staff:
         articles = Article.objects.filter(
             is_active=True).order_by('-updated_at')
@@ -177,13 +163,12 @@ def add_article(request):
             article.added_by = request.user
             article.save()
 
-            messages.success(request, article.title + ' added')
+            messages.success(request, article.title + ' added.')
 
             return HttpResponseRedirect(reverse('posts:articles'))
         else:
             messages.warning(
                 request, article.title + ' not added')
-            return redirect('posts:add_article')
 
     else:
         article_form = ArticleForm()
@@ -193,13 +178,6 @@ def add_article(request):
 
 @login_required
 def view_article(request, article_slug):
-    # if request.user.is_staff:
-    #     article = get_object_or_404(
-    #         Article, slug=article_slug, is_active=True)
-    # else:
-    #     article = get_object_or_404(
-    #         Article, slug=article_slug, added_by=request.user, is_active=True)
-
     article = get_object_or_404(
         Article, slug=article_slug, is_active=True)
 
@@ -254,16 +232,16 @@ def delete_article(request, article_slug):
         article = get_object_or_404(
             Article, slug=article_slug, added_by=request.user, is_active=True)
 
-    if (article.added_by != request.user) | request.user.is_staff == False:
+    if (article.added_by != request.user):
         messages.warning(
-            request, 'You do not have permissions to remove ' + article.title + '.')
+            request, 'You do not have permissions to remove the article "' + article.title + '".')
 
-    else:
+    elif (article.added_by == request.user) | (request.user.is_staff == False):
         article.is_active = False
         article.deleted_at = datetime.now()
         article.save()
 
-        messages.success(request, 'Article' + article.title + ' removed')
+        messages.success(request, 'Article "' + article.title + '" removed.')
 
     return HttpResponseRedirect(reverse('posts:articles'))
 
@@ -276,7 +254,7 @@ def authors(request):
         authors = UserModel.objects.filter(
             is_active=True).order_by('-updated_at')
 
-    return render(request, 'posts/authors/index.html', {})
+    return render(request, 'posts/authors/index.html', {'authors': authors})
 
 
 @login_required
@@ -308,11 +286,10 @@ def delete_author(request, username):
 
 @login_required
 def comments(request):
-    # my comments on other authors' articles
+    # (my) comments on other authors' articles
     if request.user.is_staff:
         comments_by_me = Comment.objects.filter(
             is_active=True).order_by('-updated_at')
-
     else:
         comments_by_me = Comment.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
@@ -322,26 +299,17 @@ def comments(request):
     comments_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
         1)
 
-    # comments by others on my articles
-    comments_by_others_on_my_articles = Comment.objects.filter(
-        article__added_by=request.user).order_by('-updated_at')
+    # comments by others on (my) articles
+    comments_by_others_on_my_articles = Comment.objects.exclude(
+        added_by=request.user).filter(article__added_by=request.user).order_by('-updated_at')
 
     paginator2 = Paginator(comments_by_others_on_my_articles, per_page=5)
     comments_by_others_on_my_articles_objects = paginator.get_page(1)
     comments_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
         1)
 
-    # if comments_by_others_on_my_articles.count() > comments_by_me.count():
-    #     comment_objects = comments_by_others_on_my_articles_objects
-    # elif comments_by_me.count() > comments_by_others_on_my_articles.count():
-    #     comment_objects = comment_by_me_objects
-
-    # comment_objects = max(comments_by_others_on_my_articles_objects.count(), comment_by_me_objects.count())
-
     # general render
     return render(request, 'posts/comments/index.html', {
-        'comments': comments,
-        # "comment_objects": comment_objects,
         'comments_by_me_objects': comments_by_me_objects,
         'comments_by_others_on_my_articles_objects': comments_by_others_on_my_articles_objects
     })
@@ -349,11 +317,10 @@ def comments(request):
 
 @login_required
 def comments_pages(request, page=1):
-    # my comments on other authors' articles
+    # (my) comments on other authors' articles
     if request.user.is_staff:
         comments_by_me = Comment.objects.filter(
             is_active=True).order_by('-updated_at')
-
     else:
         comments_by_me = Comment.objects.filter(
             added_by=request.user, is_active=True).order_by('-updated_at')
@@ -364,7 +331,7 @@ def comments_pages(request, page=1):
         page)
 
     # comments by others on my articles
-    comments_by_others_on_my_articles = Comment.objects.filter(
+    comments_by_others_on_my_articles = Comment.objects.exclude(added_by=request.user).filter(
         article__added_by=request.user).order_by('-updated_at')
 
     paginator2 = Paginator(comments_by_others_on_my_articles, per_page=5)
@@ -372,17 +339,8 @@ def comments_pages(request, page=1):
     comments_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
         page)
 
-    # if comments_by_others_on_my_articles.count() > comments_by_me.count():
-    #     comment_objects = comments_by_others_on_my_articles_objects.adjusted_elided_pages
-    # elif comments_by_me.count() > comments_by_others_on_my_articles.count():
-    #     comment_objects = comment_by_me_objects.adjusted_elided_pages
-
-    # comment_objects = max(comments_by_others_on_my_articles_objects.count(), comment_by_me_objects.count())
-
     # general render
     return render(request, 'posts/comments/index.html', {
-        'comments': comments,
-        # "comment_objects": comment_objects,
         'comments_by_me_objects': comments_by_me_objects,
         'comments_by_others_on_my_articles_objects': comments_by_others_on_my_articles_objects
     })
@@ -416,8 +374,8 @@ def add_comment(request, article_slug):
         comment_form = CommentForm()
 
     return render(request, 'posts/comments/add.html', {
-        'comment_form': comment_form,
-        'article': article
+        'article': article,
+        'comment_form': comment_form
     })
 
 
@@ -462,11 +420,11 @@ def delete_comment(request, comment_slug):
         comment = get_object_or_404(
             Comment, slug=comment_slug, added_by=request.user, is_active=True)
 
-    if (comment.added_by != request.user) | request.user.is_staff == False:
+    if (comment.added_by != request.user):
         messages.warning(
             request, 'You do not have permissions to remove ' + comment.title + '.')
 
-    else:
+    elif (comment.added_by == request.user) | (request.user.is_staff == False):
         comment.is_active = False
         comment.deleted_at = datetime.now()
         comment.save()
@@ -476,137 +434,224 @@ def delete_comment(request, comment_slug):
     return HttpResponseRedirect(reverse('posts:comments'))
 
 
-# Reactions
+# Likes
 
 @login_required
-def reactions(request):
-    # my comments on other authors' articles
+def likes(request):
     if request.user.is_staff:
-        reactions_by_me = Reaction.objects.filter(
-            is_active=True).order_by('-updated_at')
-
+        topics_likes = Like.objects.filter(like_dislike=True, is_active=True)
+        articles_likes = Like.objects.filter(like_dislike=True, is_active=True)
+        comments_likes = Like.objects.filter(like_dislike=True, is_active=True)
     else:
-        reactions_by_me = Reaction.objects.filter(
-            added_by=request.user, is_active=True).order_by('-updated_at')
+        topics_likes = Like.objects.filter(
+            like_dislike=True, added_by=request.user, is_active=True)
+        articles_likes = Like.objects.filter(
+            like_dislike=True, added_by=request.user, is_active=True)
+        comments_likes = Like.objects.filter(
+            like_dislike=True, added_by=request.user, is_active=True)
 
-    paginator = Paginator(reactions_by_me, per_page=5)
-    reactions_by_me_objects = paginator.get_page(1)
-    reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
-        1)
+    topics_likes_count = topics_likes.count()
+    articles_likes_count = articles_likes.count()
+    comments_likes_count = comments_likes.count()
 
-    # reactions by others on my articles
-    reactions_by_others_on_my_articles = Reaction.objects.filter(
-        article__added_by=request.user).order_by('-updated_at')
-
-    paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
-    reactions_by_others_on_my_articles_objects = paginator.get_page(1)
-    reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
-        1)
-
-    # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
-    #     reaction_objects = reactions_by_others_on_my_articles_objects
-    # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
-    #     reaction_objects = reaction_by_me_objects
-
-    # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
-
-    # general render
-    return render(request, 'posts/reactions/index.html', {
-        'reactions': reactions,
-        # "reaction_objects": reaction_objects,
-        'reactions_by_me_objects': reactions_by_me_objects,
-        'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
+    return render(request, 'posts/likes/index.html', {
+        'topics_likes': topics_likes,
+        'articles_likes': articles_likes,
+        'comments_likes': comments_likes,
+        'topics_likes_count': topics_likes_count,
+        'articles_likes_count': articles_likes_count,
+        'comments_likes_count': comments_likes_count
     })
 
 
 @login_required
-def reactions_pages(request, page=1):
-    # my reactions on other authors' articles
-    if request.user.is_staff:
-        reactions_by_me = Reaction.objects.filter(
-            is_active=True).order_by('-updated_at')
+def add_remove_topic_like(request, topic_slug):
+    like = Like.objects.get(topic__slug=topic_slug, added_by=request.user)
 
+    if like.exists():
+        Like.objects.filter(like_dislike=True).update(default=False)
+        Like.objects.filter(like_dislike=False).update(default=True)
     else:
-        reactions_by_me = Reaction.objects.filter(
-            added_by=request.user, is_active=True).order_by('-updated_at')
+        Like.objects.create(
+            like_dislike=True,
+            slug=slugify(
+                str(topic_slug) + str(datetime.now()), allow_unicode=False
+            ),
+            added_by=request.user
+        )
 
-    paginator = Paginator(reactions_by_me, per_page=2)
-    reactions_by_me_objects = paginator.get_page(page)
-    reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
-        page)
-
-    # reactions by others on my articles
-    reactions_by_others_on_my_articles = Reaction.objects.filter(
-        article__added_by=request.user).order_by('-updated_at')
-
-    paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
-    reactions_by_others_on_my_articles_objects = paginator.get_page(page)
-    reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
-        page)
-
-    # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
-    #     reaction_objects = reactions_by_others_on_my_articles_objects.adjusted_elided_pages
-    # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
-    #     reaction_objects = reaction_by_me_objects.adjusted_elided_pages
-
-    # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
-
-    # general render
-    return render(request, 'posts/reactions/index.html', {
-        'reactions': reactions,
-        # "reaction_objects": reaction_objects,
-        'reactions_by_me_objects': reactions_by_me_objects,
-        'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
-    })
+    messages.success(request, 'You reacted on this topic')
 
 
 @login_required
-def add_update_article_reaction(request, article_slug):
-    reaction = Reaction.objects.get(slug=article_slug, added_by=request.user)
+def add_remove_article_like(request, article_slug):
+    like = Like.objects.get(article__slug=article_slug, added_by=request.user)
 
-    if request.method == 'POST':
-        if reaction is not None:
-            reaction.type = reaction_form.cleaned_data['type']
-            reaction.save()
-
-            return redirect('posts:article', article_slug)
-        else:
-            article = Article.objects.get(
-                article__slug=article_slug, added_by=request.user)
-
-            reaction.type = reaction_form.cleaned_data['type']
-            reaction.article = article.id
-            reaction.added_by = request.user
-            reaction.save()
-
-            return redirect('posts:article', article_slug)
+    if like.exists():
+        Like.objects.filter(like_dislike=True).update(default=False)
+        Like.objects.filter(like_dislike=False).update(default=True)
     else:
-        reaction_form = ReactionForm()
+        Like.objects.create(
+            like_dislike=True,
+            slug=slugify(
+                str(article_slug) + str(datetime.now()), allow_unicode=False
+            ),
+            added_by=request.user
+        )
 
-    return render(request, 'posts/articles/article.html', {'reaction_form': reaction_form})
+    messages.success(request, 'You reacted on this article')
 
 
 @login_required
-def add_update_comment_reaction(request, comment_slug):
-    reaction = Reaction.objects.get(slug=comment_slug, added_by=request.user)
+def add_remove_comment_like(request, comment_slug):
+    like = Like.objects.get(comment__slug=comment_slug, added_by=request.user)
 
-    if request.method == 'POST':
-        if reaction is not None:
-            reaction.type = reaction_form.cleaned_data['type']
-            reaction.save()
-
-            return redirect('posts:comment', comment_slug)
-        else:
-            comment = Comment.objects.get(
-                comment__slug=comment_slug, added_by=request.user)
-
-            reaction.type = reaction_form.cleaned_data['type']
-            reaction.comment = comment.id
-            reaction.added_by = request.user
-            reaction.save()
-
-            return redirect('posts:comment', comment_slug)
+    if like.exists():
+        Like.objects.filter(like_dislike=True).update(default=False)
+        Like.objects.filter(like_dislike=False).update(default=True)
     else:
-        reaction_form = ReactionForm()
+        Like.objects.create(
+            like_dislike=True,
+            slug=slugify(
+                str(comment_slug) + str(datetime.now()), allow_unicode=False
+            ),
+            added_by=request.user
+        )
 
-    return render(request, 'posts/comments/comment.html', {'reaction_form': reaction_form})
+    messages.success(request, 'You reacted on this comment')
+
+
+# # Reactions
+
+# @login_required
+# def reactions(request):
+#     # my comments on other authors' articles
+#     if request.user.is_staff:
+#         reactions_by_me = Reaction.objects.filter(
+#             is_active=True).order_by('-updated_at')
+
+#     else:
+#         reactions_by_me = Reaction.objects.filter(
+#             added_by=request.user, is_active=True).order_by('-updated_at')
+
+#     paginator = Paginator(reactions_by_me, per_page=5)
+#     reactions_by_me_objects = paginator.get_page(1)
+#     reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+#         1)
+
+#     # reactions by others on my articles
+#     reactions_by_others_on_my_articles = Reaction.objects.filter(
+#         article__added_by=request.user).order_by('-updated_at')
+
+#     paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
+#     reactions_by_others_on_my_articles_objects = paginator.get_page(1)
+#     reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+#         1)
+
+#     # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
+#     #     reaction_objects = reactions_by_others_on_my_articles_objects
+#     # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
+#     #     reaction_objects = reaction_by_me_objects
+
+#     # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
+
+#     # general render
+#     return render(request, 'posts/reactions/index.html', {
+#         'reactions': reactions,
+#         # "reaction_objects": reaction_objects,
+#         'reactions_by_me_objects': reactions_by_me_objects,
+#         'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
+#     })
+
+
+# @login_required
+# def reactions_pages(request, page=1):
+#     # my reactions on other authors' articles
+#     if request.user.is_staff:
+#         reactions_by_me = Reaction.objects.filter(
+#             is_active=True).order_by('-updated_at')
+
+#     else:
+#         reactions_by_me = Reaction.objects.filter(
+#             added_by=request.user, is_active=True).order_by('-updated_at')
+
+#     paginator = Paginator(reactions_by_me, per_page=2)
+#     reactions_by_me_objects = paginator.get_page(page)
+#     reactions_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+#         page)
+
+#     # reactions by others on my articles
+#     reactions_by_others_on_my_articles = Reaction.objects.filter(
+#         article__added_by=request.user).order_by('-updated_at')
+
+#     paginator2 = Paginator(reactions_by_others_on_my_articles, per_page=5)
+#     reactions_by_others_on_my_articles_objects = paginator.get_page(page)
+#     reactions_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+#         page)
+
+#     # if reactions_by_others_on_my_articles.count() > reactions_by_me.count():
+#     #     reaction_objects = reactions_by_others_on_my_articles_objects.adjusted_elided_pages
+#     # elif reactions_by_me.count() > reactions_by_others_on_my_articles.count():
+#     #     reaction_objects = reaction_by_me_objects.adjusted_elided_pages
+
+#     # reaction_objects = max(reactions_by_others_on_my_articles_objects.count(), reaction_by_me_objects.count())
+
+#     # general render
+#     return render(request, 'posts/reactions/index.html', {
+#         'reactions': reactions,
+#         # "reaction_objects": reaction_objects,
+#         'reactions_by_me_objects': reactions_by_me_objects,
+#         'reactions_by_others_on_my_articles_objects': reactions_by_others_on_my_articles_objects
+#     })
+
+
+# @login_required
+# def add_update_article_reaction(request, article_slug):
+#     reaction = Reaction.objects.get(slug=article_slug, added_by=request.user)
+
+#     if request.method == 'POST':
+#         if reaction is not None:
+#             reaction.type = reaction_form.cleaned_data['type']
+#             reaction.save()
+
+#             return redirect('posts:article', article_slug)
+#         else:
+#             article = Article.objects.get(
+#                 article__slug=article_slug, added_by=request.user)
+
+#             reaction.type = reaction_form.cleaned_data['type']
+#             reaction.article = article.id
+#             reaction.added_by = request.user
+#             reaction.save()
+
+#             return redirect('posts:article', article_slug)
+#     else:
+#         reaction_form = ReactionForm()
+
+#     return render(request, 'posts/articles/article.html', {'reaction_form': reaction_form})
+
+
+# @login_required
+# def add_update_comment_reaction(request, comment_slug):
+#     reaction = Reaction.objects.get(slug=comment_slug, added_by=request.user)
+
+#     if request.method == 'POST':
+#         if reaction is not None:
+#             reaction.type = reaction_form.cleaned_data['type']
+#             reaction.save()
+
+#             return redirect('posts:comment', comment_slug)
+#         else:
+#             comment = Comment.objects.get(
+#                 comment__slug=comment_slug, added_by=request.user)
+
+#             reaction.type = reaction_form.cleaned_data['type']
+#             reaction.comment = comment.id
+#             reaction.added_by = request.user
+#             reaction.save()
+
+#             return redirect('posts:comment', comment_slug)
+#     else:
+#         reaction_form = ReactionForm()
+
+#     return render(request, 'posts/comments/comment.html', {'reaction_form': reaction_form})

@@ -1,7 +1,7 @@
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 from django import forms
-from .models import Topic, Article, Comment, Reaction
+from .models import Topic, Article, Comment
 
 
 class TopicForm(forms.ModelForm):
@@ -95,11 +95,11 @@ class CommentForm(forms.ModelForm):
         )
 
 
-class ReactionForm(forms.ModelForm):
-    class Meta:
-        model = Reaction
-        fields = ['type']
+# class ReactionForm(forms.ModelForm):
+#     class Meta:
+#         model = Reaction
+#         fields = ['type']
 
-    def clean_type(self):
-        type = self.cleaned_data['type']
-        return type
+#     def clean_type(self):
+#         type = self.cleaned_data['type']
+#         return type

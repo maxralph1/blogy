@@ -19,22 +19,24 @@ urlpatterns = [
     path('topics/', views.topics, name='topics'),
     path('topics/<slug:topic_slug>/', views.topic, name='topic'),
 
-    path('search-articles/', views.search_articles, name='search_articles'),
-    path('search-articles/<slug:query>/pages=<int:page>/',
-         views.search_articles_pages, name='search_articles_pages'),
-
-    # Authors
     path('authors/', views.authors, name='authors'),
     path('authors/<slug:username>/',
          views.author, name='author'),
     path('authors/pages=<int:page>/',
          views.authors_pages, name='authors_pages'),
 
-    path('reaction-on-article/<slug:article_slug>/',
-         views.reaction_on_article, name='reaction_on_article'),
+    path('search/', views.search, name='search'),
+    path('search/<slug:query>/pages=<int:page>/',
+         views.search_pages, name='search_pages'),
+
+    path('about-us/', TemplateView.as_view(
+         template_name='pages/about_us.html'), name='about_us'),
+
+
+
+    #     path('reaction-on-article/<slug:article_slug>/',
+    #          views.reaction_on_article, name='reaction_on_article'),
     # path('reaction-on-article/<slug:article_slug>/<slug:reaction>/',
     #      views.reaction_on_article, name='reaction_on_article'),
 
-    path('about-us/', TemplateView.as_view(
-        template_name='pages/about_us.html'), name='about_us')
 ]

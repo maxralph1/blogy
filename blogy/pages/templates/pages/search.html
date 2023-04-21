@@ -14,7 +14,7 @@
         <h2 class="fst-italic">
             Search for: <span class="fw-bold">{{ query }}</span>
         </h2>
-        <span class="mx-4">{{ results_count }} results</span>
+        <span class="mx-4">{{ results_count }} result{% if results_count < 2 %}{% else %}s{% endif %}</span>
     </section>
         
     {% endblock %}
@@ -62,19 +62,19 @@
                     </article>
                 {% endfor %}
             {% else %}
-                    <p class="text-center fs-5 my-4">There are no existing articles yet. <a href="{% url 'posts:add_article' %}" class="text-danger">Add One</a>.</p>
+                    <p class="text-center fs-5 my-4">Your search term<span class="fw-bold text-dark"> "{{ query }}"</span> did not match our records. You should try another search term.</p>
             {% endif %}
         </section>
 
         <section>
             <nav class="blog-pagination" aria-label="Pagination">
                 {% if articles_objects.has_previous %}
-                    <a href="{% url 'pages:search_articles_pages' query articles_objects.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
+                    <a href="{% url 'pages:search_pages' query articles_objects.previous_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill">
                         Newer
                     </a>
                 {% endif %}
                 {% if articles_objects.has_next %}
-                    <a href="{% url 'pages:search_articles_pages' query articles_objects.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
+                    <a href="{% url 'pages:search_pages' query articles_objects.next_page_number %}" class="btn btn-outline-danger fw-bold rounded-pill ms-3">
                         Older
                     </a>
                 {% endif %}

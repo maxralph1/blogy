@@ -124,8 +124,8 @@ class PasswordResetConfirmForm(SetPasswordForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = UserModel
-        fields = ('username', 'email', 'name', 'photo', 'phone',
-                  'about_me', 'web', 'instagram', 'twitter',)
+        fields = ['username', 'email', 'name', 'phone',
+                  'about_me', 'web', 'instagram', 'twitter']
 
     username = forms.CharField(
         label='Account Username (cannot be changed)*',
@@ -155,12 +155,6 @@ class UserEditForm(forms.ModelForm):
             attrs={'class': 'form-control',
                    'placeholder': 'e.g. +123456789', 'name': 'phone', 'id': 'phone'}
         ))
-    photo = forms.CharField(
-        label='Photo',
-        widget=forms.TextInput(
-            attrs={'type': 'file', 'class': 'form-control',
-                   'placeholder': 'Upload your photo', 'name': 'photo', 'id': 'photo'}
-        ))
     about_me = forms.CharField(
         label='About Me',
         widget=forms.TextInput(
@@ -186,6 +180,17 @@ class UserEditForm(forms.ModelForm):
                    'placeholder': 'e.g. http://twitter.com/johndoe/', 'name': 'twitter', 'id': 'twitter'}
         ))
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].required = False
+        self.fields['email'].required = False
+        self.fields['name'].required = False
+        self.fields['phone'].required = False
+        self.fields['about_me'].required = False
+        self.fields['web'].required = False
+        self.fields['instagram'].required = False
+        self.fields['twitter'].required = False
+
     def clean_username(self):
         username = self.cleaned_data['username']
         return username
@@ -202,10 +207,6 @@ class UserEditForm(forms.ModelForm):
         phone = self.cleaned_data['phone']
         return phone
 
-    def clean_photo(self):
-        photo = self.cleaned_data['photo']
-        return photo
-
     def clean_about_me(self):
         about_me = self.cleaned_data['about_me']
         return about_me
@@ -221,3 +222,25 @@ class UserEditForm(forms.ModelForm):
     def clean_twitter(self):
         twitter = self.cleaned_data['twitter']
         return twitter
+
+
+class UserPhotoForm(forms.ModelForm):
+    class Meta:
+        model = UserModel
+        fields = ['photo']
+
+    photo = forms.CharField(
+        label='Profile Photo*',
+        widget=forms.TextInput(
+            attrs={'type': 'file', 'class': 'form-control', 'placeholder': 'Update Profile Photo',
+                   'id': 'photo'}
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['photo'].required = False
+
+    def clean_photo(self):
+        photo = self.cleaned_data['photo']
+        return photo

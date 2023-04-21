@@ -2,10 +2,16 @@
 
 {% load static %}
 
+{% block title %}Comments{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Comments</li>
+{% endblock %}
+
 {% block main %}
 
     <div class="row">
-
         <section class="col-lg-8">
             <div class="card" id="comments_by_me">
                 <div class="card-body">
@@ -14,9 +20,8 @@
                 <div class="comment-widgets scrollable">
                     {% if comments_by_me_objects %}
                         {% for comment in comments_by_me_objects %}
-                            
                             <div class="d-flex flex-row comment-row border-top">
-                                <a href="{% url 'posts:view_comment' comment.article.slug %}" class="text-dark d-flex flex-wrap align-items-center">
+                                <a href="{% url 'posts:view_comment' comment.slug %}" class="text-dark d-flex flex-wrap align-items-center">
                                     <div class="comment-text active">
                                         <div class="d-flex flex-column w-100">
                                             <h6 class="font-medium">{{ comment.title|truncatewords:25 }}</h6>
@@ -35,7 +40,6 @@
                                                     <a href="{% url 'posts:delete_comment' comment.slug %}"><i class="ti-trash text-secondary"></i></a>
                                                 {% endif %}
                                             </div>
-                                            
                                         </div>
                                         <div class="d-flex flex-column text-end w-100 mt-5 px-1">
                                             <span class="d-flex flex-column fs-6 fst-italic text-muted">Commented on ...</span>
@@ -49,14 +53,12 @@
                                     </div>
                                 </a>
                             </div>
-                            
                         {% endfor %}
                     {% else %}
                             <p class="text-center fs-5 my-4">There are no existing comments yet by you on articles by others.</p>
                     {% endif %}
                 </div>
                 <div class="d-flex justify-content-center gap-2 mb-4 border-top pt-2">
-                    
                     {% for page_number in comments_by_me_objects.adjusted_elided_pages %}
                         {% if page_number == comments_by_me_objects.paginator.ELLIPSIS %}
                             {{ page_number }}
@@ -69,7 +71,6 @@
                             </a>
                         {% endif %}
                     {% endfor %}
-                   
                 </div>
             </div>
 
@@ -81,40 +82,40 @@
                     {% if comments_by_others_on_my_articles_objects %}
                         {% for comment in comments_by_others_on_my_articles_objects %}
                             
-                            <div class="d-flex flex-row comment-row border-top">
-                                <a href="{% url 'posts:view_comment' comment.article.slug %}" class="text-dark d-flex flex-wrap align-items-center">
-                                    <div class="comment-text active">
-                                        <div class="d-flex flex-column w-100">
-                                            <h6 class="font-medium">{{ comment.title|truncatewords:25 }}</h6>
-                                            <p class="fst-italic text-muted d-flex flex-column fs-6">
-                                                <span>by {{ comment.added_by.name|truncatewords:25 }}</span>
-                                                <span>written: {{ comment.created_at }}</span>
-                                                <span>updated: {{ comment.updated_at }}</span>
-                                            </p>                                          
-                                            <p class="m-b-15 d-block text-break">{{ comment.body|truncatewords:25|safe }} </p>
-                                        </div>
-                                        <div class="d-flex justify-content-end align-items-center gap-4">
-                                            <div class="d-flex justify-content-end gap-4">
-                                                <a href="{% url 'posts:view_comment' comment.slug %}"><i class="ti-eye text-success"></i></a>
-                                                {% if comment.added_by == request.user or request.user.is_staff %}
-                                                    <a href="{% url 'posts:update_comment' comment.slug %}"><i class="ti-pencil-alt text-warning"></i></a>
-                                                    <a href="{% url 'posts:delete_comment' comment.slug %}"><i class="ti-trash text-secondary"></i></a>
-                                                {% endif %}
+                                <div class="d-flex flex-row comment-row border-top">
+                                    <a href="{% url 'posts:view_comment' comment.slug %}" class="text-dark d-flex flex-wrap align-items-center">
+                                        <div class="comment-text active">
+                                            <div class="d-flex flex-column w-100">
+                                                <h6 class="font-medium">{{ comment.title|truncatewords:25 }}</h6>
+                                                <p class="fst-italic text-muted d-flex flex-column fs-6">
+                                                    <span>by {{ comment.added_by.name|truncatewords:25 }}</span>
+                                                    <span>written: {{ comment.created_at }}</span>
+                                                    <span>updated: {{ comment.updated_at }}</span>
+                                                </p>                                          
+                                                <p class="m-b-15 d-block text-break">{{ comment.body|truncatewords:25|safe }} </p>
                                             </div>
-                                            
+                                            <div class="d-flex justify-content-end align-items-center gap-4">
+                                                <div class="d-flex justify-content-end gap-4">
+                                                    <a href="{% url 'posts:view_comment' comment.slug %}"><i class="ti-eye text-success"></i></a>
+                                                    <!-- Extra security. Not that it would be useful -->
+                                                    {% if comment.added_by == request.user or request.user.is_staff %} 
+                                                        <a href="{% url 'posts:update_comment' comment.slug %}"><i class="ti-pencil-alt text-warning"></i></a>
+                                                        <a href="{% url 'posts:delete_comment' comment.slug %}"><i class="ti-trash text-secondary"></i></a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-column text-end w-100 mt-5 px-1">
+                                                <span class="d-flex flex-column fs-6 fst-italic text-muted">Commented on ...</span>
+                                                <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-4 py-1 fs-5 text-break text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
+                                                <h6 class="font-medium fst-italic">{{ comment.article.title|truncatewords:25 }}</h6>
+                                                <p class="d-flex flex-column fs-6 fst-italic text-muted">
+                                                    <span class="fst-italic text-muted px-1">by {{ comment.article.added_by.name|truncatewords:25 }}</span>
+                                                    <span class="fst-italic text-muted px-1">written: {{ comment.article.created_at }}</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div class="d-flex flex-column text-end w-100 mt-5 px-1">
-                                            <span class="d-flex flex-column fs-6 fst-italic text-muted">Commented on ...</span>
-                                            <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-4 py-1 fs-5 text-break text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
-                                            <h6 class="font-medium fst-italic">{{ comment.article.title|truncatewords:25 }}</h6>
-                                            <p class="d-flex flex-column fs-6 fst-italic text-muted">
-                                                <span class="fst-italic text-muted px-1">by {{ comment.article.added_by.name|truncatewords:25 }}</span>
-                                                <span class="fst-italic text-muted px-1">written: {{ comment.article.created_at }}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                                    </a>
+                                </div>
                             
                         {% endfor %}
                     {% else %}
@@ -124,100 +125,7 @@
             </div>
         </section>
 
-        <section class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Feeds</h4>
-                    <div class="feed-widget">
-                        <ul class="list-style-none feed-body m-0 p-b-20">
-                            <li class="feed-item">
-                                <div class="feed-icon bg-info"><i class="far fa-bell"></i></div> You have 4
-                                pending tasks. <span class="ms-auto font-12 text-muted">Just Now</span>
-                            </li>
-                            <li class="feed-item">
-                                <div class="feed-icon bg-success"><i class="ti-server"></i></div> Server #1
-                                overloaded.<span class="ms-auto font-12 text-muted">2 Hours ago</span>
-                            </li>
-                            <li class="feed-item">
-                                <div class="feed-icon bg-warning"><i class="ti-shopping-cart"></i></div> New
-                                order received.<span class="ms-auto font-12 text-muted">31 May</span>
-                            </li>
-                            <li class="feed-item">
-                                <div class="feed-icon bg-danger"><i class="ti-user"></i></div> New user
-                                registered.<span class="ms-auto font-12 text-muted">30 May</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-
-    <div class="row">
-        <section class="col-lg-6">
-            <!-- <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Recent Comments by Others on Your Articles</h4>
-                </div>
-                <div class="comment-widgets scrollable">
-                    <div class="d-flex flex-row comment-row m-t-0">
-                        <div class="p-2"><img src="../../assets/images/users/1.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text w-100">
-                            <h6 class="font-medium">James Anderson</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer">
-                                <span class="text-muted float-end">April 14, 2021</span> <span
-                                    class="label label-rounded label-primary">Pending</span> <span
-                                    class="action-icons">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-check"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart"></i></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row comment-row">
-                        <div class="p-2"><img src="../../assets/images/users/4.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text active w-100">
-                            <h6 class="font-medium">Michael Jorden</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer ">
-                                <span class="text-muted float-end">April 14, 2021</span>
-                                <span class="label label-success label-rounded">Approved</span>
-                                <span class="action-icons active">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="icon-close"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart text-danger"></i></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row comment-row">
-                        <div class="p-2"><img src="../../assets/images/users/5.jpg" alt="user" width="50"
-                                class="rounded-circle"></div>
-                        <div class="comment-text w-100">
-                            <h6 class="font-medium">Johnathan Doeting</h6>
-                            <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing
-                                and type setting industry. </span>
-                            <div class="comment-footer">
-                                <span class="text-muted float-end">April 14, 2021</span>
-                                <span class="label label-rounded label-danger">Rejected</span>
-                                <span class="action-icons">
-                                    <a href="javascript:void(0)"><i class="ti-pencil-alt"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-check"></i></a>
-                                    <a href="javascript:void(0)"><i class="ti-heart"></i></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-        </section>
+        {% include 'dashboard/includes/feeds.html' %}
     </div>
 
 {% endblock %}
