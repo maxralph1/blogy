@@ -2,7 +2,13 @@
 
 {% load static %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock %}
+
 {% block title %}Articles{% endblock %}
+
+{% block heading %}Articles{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
@@ -49,7 +55,7 @@
                                     </div>
                                     <div class="comment-text active">
                                         <div class="d-flex flex-column w-100">
-                                            <p class="label label-{{ article.topic.representative_color }} label-rounded px-3 py-1 fs-5 text-break text-end w-50 align-self-end">{{ article.topic.title }}</p>
+                                            <p class="label label-{{ article.topic.representative_color }} label-rounded px-3 py-1 fs-5 text-end w-50 align-self-end">{{ article.topic.title }}</p>
                                             <h6 class="font-medium">{{ article.title|truncatewords:25 }}</h6>
                                             <p class="fst-italic text-muted d-flex flex-column fs-6">
                                                 <span>by {{ article.added_by.name|truncatewords:25 }}</span>

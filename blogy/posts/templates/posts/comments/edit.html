@@ -4,6 +4,8 @@
 
 {% block title %}Update Comment{% endblock %}
 
+{% block heading %}Update Comment{% endblock %}
+
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="{% url 'posts:comments' %}" class="text-dark">Comments</a></li>
@@ -42,7 +44,7 @@
                         </div>
                         <div class="row">
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-warning text-white text-end">Update Comment</button>
+                                <button type="submit" class="btn btn-warning text-dark fw-bold text-end">Update Comment</button>
                             </div>
                         </div>
                     </form>

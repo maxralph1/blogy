@@ -2,20 +2,30 @@
 
 {% load static %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock %}
+
+{% block title %}Authors{% endblock %}
+
+{% block heading %}Authors{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Authors</li>
+{% endblock %}
+
 {% block main %}
 
     <div class="row">
-        <!-- column -->
-        <div class="col-12">
+        <section class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <!-- title -->
                     <div class="d-md-flex">
                         <div>
-                            <h4 class="card-title">Top Selling Products</h4>
-                            <h5 class="card-subtitle">Overview of Top Selling Items</h5>
+                            <h3 class="card-title fs-4">Authors</h3>
                         </div>
-                        <div class="ms-auto">
+                        <!-- <div class="ms-auto">
                             <div class="dl">
                                 <select class="form-select shadow-none">
                                     <option value="0" selected="">Monthly</option>
@@ -24,113 +34,54 @@
                                     <option value="3">Yearly</option>
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
-                    <!-- title -->
                 </div>
                 <div class="table-responsive">
                     <table class="table v-middle">
                         <thead>
                             <tr class="bg-light">
-                                <th class="border-top-0">Products</th>
-                                <th class="border-top-0">License</th>
-                                <th class="border-top-0">Support Agent</th>
-                                <th class="border-top-0">Technology</th>
-                                <th class="border-top-0">Tickets</th>
-                                <th class="border-top-0">Sales</th>
-                                <th class="border-top-0">Earnings</th>
+                                <th class="border-top-0">Author</th>
+                                <th class="border-top-0 text-center">@Username</th>
+                                <th class="border-top-0 text-center">Email</th>
+                                <th class="border-top-0 text-center">Phone</th>
+                                <th class="border-top-0 text-center">Topics</th>
+                                <th class="border-top-0 text-center">Articles</th>
+                                <th class="border-top-0 text-center">Comments</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="m-r-10"><a class="btn btn-circle d-flex btn-info text-white">EA</a>
+                            {% for author in authors %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="m-r-10">
+                                                <img src="{% if author.photo != 'images/default.png' %}{{ author.photo.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}" alt="" width="34" height="34">
+                                            </div>
+                                            <div class="">
+                                                <span class="fw-bold">{{ author.name }}</span>
+                                            </div>
                                         </div>
-                                        <div class="">
-                                            <h4 class="m-b-0 font-16">Elite Admin</h4>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Single Use</td>
-                                <td>John Doe</td>
-                                <td>
-                                    <label class="label label-danger">Angular</label>
-                                </td>
-                                <td>46</td>
-                                <td>356</td>
-                                <td>
-                                    <h5 class="m-b-0">$2850.06</h5>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="m-r-10"><a class="btn btn-circle d-flex btn-orange text-white">MA</a>
-                                        </div>
-                                        <div class="">
-                                            <h4 class="m-b-0 font-16">Monster Admin</h4>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Single Use</td>
-                                <td>Venessa Fern</td>
-                                <td>
-                                    <label class="label label-info">Vue Js</label>
-                                </td>
-                                <td>46</td>
-                                <td>356</td>
-                                <td>
-                                    <h5 class="m-b-0">$2850.06</h5>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="m-r-10"><a class="btn btn-circle d-flex btn-success text-white">MP</a>
-                                        </div>
-                                        <div class="">
-                                            <h4 class="m-b-0 font-16">Material Pro Admin</h4>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Single Use</td>
-                                <td>John Doe</td>
-                                <td>
-                                    <label class="label label-success">Bootstrap</label>
-                                </td>
-                                <td>46</td>
-                                <td>356</td>
-                                <td>
-                                    <h5 class="m-b-0">$2850.06</h5>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="m-r-10"><a class="btn btn-circle d-flex btn-purple text-white">AA</a>
-                                        </div>
-                                        <div class="">
-                                            <h4 class="m-b-0 font-16">Ample Admin</h4>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Single Use</td>
-                                <td>John Doe</td>
-                                <td>
-                                    <label class="label label-purple">React</label>
-                                </td>
-                                <td>46</td>
-                                <td>356</td>
-                                <td>
-                                    <h5 class="m-b-0">$2850.06</h5>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="fw-bold fs-5 text-center">@{{ author.username }}</td>
+                                    <td class="fs-5 text-center">{{ author.email }}</td>
+                                    <td class="fs-5 text-center">{{ author.phone }}</td>
+                                    <td class="fs-5 text-center">{{ author.topic_set.all.count }}</td>
+                                    <td class="fs-5 text-center">{{ author.article_set.all.count }}</td>
+                                    <td class="fs-5 text-center">{{ author.comment_set.all.count }}</td>
+                                    <td>
+                                        <a href="{% url 'posts:view_author' author.username %}" class="btn btn-sm btn-danger text-white text-nowrap">See More</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </section>
+
+        {% include 'dashboard/includes/feeds.html' %}
     </div>
 
 {% endblock %}

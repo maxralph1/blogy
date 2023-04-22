@@ -229,9 +229,9 @@ class UserPhotoForm(forms.ModelForm):
         model = UserModel
         fields = ['photo']
 
-    photo = forms.CharField(
+    photo = forms.ImageField(
         label='Profile Photo*',
-        widget=forms.TextInput(
+        widget=forms.FileInput(
             attrs={'type': 'file', 'class': 'form-control', 'placeholder': 'Update Profile Photo',
                    'id': 'photo'}
         )

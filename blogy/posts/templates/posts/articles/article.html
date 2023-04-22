@@ -4,6 +4,8 @@
 
 {% block title %}Article | {{ article.title|title }}{% endblock %}
 
+{% block heading %}Article | {{ article.title|title|truncatewords:13 }}{% endblock %}
+
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="{% url 'posts:articles' %}" class="text-dark">Articles</a></li>

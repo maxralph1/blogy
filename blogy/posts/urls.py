@@ -56,13 +56,13 @@ urlpatterns = [
 
     # Likes
     path('likes/', views.likes, name='likes'),
-    path('likes/<slug:topic_slug>/',
+    path('likes/<int:page>', views.likes_pages, name='likes_pages'),
+    path('likes/topics/<slug:topic_slug>/',
          views.add_remove_topic_like, name='add_remove_topic_like'),
-    path('likes/<slug:article_slug>/',
+    path('likes/articles/<slug:article_slug>/',
          views.add_remove_article_like, name='add_remove_article_like'),
-    path('likes/<slug:comment_slug>/',
+    path('likes/comments/<slug:comment_slug>/',
          views.add_remove_comment_like, name='add_remove_comment_like')
-
 
 
     # Reactions

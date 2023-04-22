@@ -1,21 +1,20 @@
 from datetime import datetime
 
-from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect,  render
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
+from posts.models import Article, Comment
 from .forms import UserRegistrationForm, UserLoginForm, CustomPasswordResetForm, UserEditForm, UserPhotoForm
 from .models import UserModel
-from posts.models import Article, Comment
 from .tokens import account_activation_token, password_reset_token
 
 
@@ -121,7 +120,7 @@ def dashboard(request):
         added_by=request.user, is_active=True).order_by('-updated_at')[:4]
 
     comments_by_others_on_my_articles = Comment.objects.filter(
-        article__added_by=request.user).order_by('-updated_at')[:4]
+        article__added_by=request.user, is_active=True).order_by('-updated_at')[:4]
 
     return render(request, 'accounts/dashboard/index.html', {
         'articles': articles,
@@ -131,30 +130,17 @@ def dashboard(request):
     })
 
 
-# @login_required
-# def user_articles(request, user_slug):
-#     pass
-
-
-# @login_required
-# def user_comments(request, user_slug):
-#     pass
-
-
-# @login_required
-# def user_reactions(request, user_reactions):
-#     pass
-
-
 @login_required
 def profile(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
         userphoto_form = UserPhotoForm(
-            instance=request.user, data=request.FILES)
+            instance=request.user, data=request.FILES, files=request.FILES)
 
         if user_form.is_valid():
             user_form.save()
+
+            return HttpResponseRedirect(reverse('accounts:profile'))
     else:
         user_form = UserEditForm(instance=request.user)
         userphoto_form = UserPhotoForm(instance=request.user)
@@ -170,7 +156,7 @@ def profile_photo(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
         userphoto_form = UserPhotoForm(
-            instance=request.user, data=request.FILES)
+            instance=request.user, data=request.POST, files=request.FILES)
 
         if userphoto_form.is_valid():
             userphoto_form.save()

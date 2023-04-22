@@ -15,9 +15,7 @@
         </h2>
     {% endblock %}
 
-
     {% block main %}
-
         <section>
             {% if hot_articles %}
                 {% for article in hot_articles %}
@@ -41,7 +39,13 @@
                                                 {{ article.comment_set.all.count }} comments
                                             {% endif %}
                                         </a>
-                                        <a class="text-danger">100 reactions</a>
+                                        <a class="text-danger">
+                                            {% if article.like_set.all.count < 2 %}
+                                                {{ article.like_set.all.count }} like
+                                            {% else %}
+                                                {{ article.like_set.all.count }} likes
+                                            {% endif %}
+                                        </a>
                                     </div>
                                     <div class="col-auto d-none d-lg-block">
                                         <img src="
@@ -76,8 +80,6 @@
                 {% endif %}
             </nav>
         </section>
-
     {% endblock %}
-
 
 {% endblock %}

@@ -10,19 +10,16 @@
 {% block content %}
     
     {% block heading %}
-        <section>
-            <h2 class="blog-post-title mb-3">
+        <section class="mb-3 fst-italic border-bottom">
+            <h2 class="blog-post-title">
                 {{ topic.title }}
             </h2>
-            <p class="blog-post-meta mb-5">{{ topic.created_at }} by <a href="#" class="text-danger">{{ topic.added_by.name }}</a></p>
-            </section>
-        
+            <p class="blog-post-meta">{{ topic.created_at }} by <a href="{% url 'pages:author' topic.added_by.username %}" class="text-danger">{{ topic.added_by.name }}</a></p>
+        </section>
     {% endblock %}
 
     {% block main %}
-
         <section>
-
             <article class="blog-post">
                 <section>
                     {{ topic.description }}
@@ -36,7 +33,7 @@
                             {{ articles_count }} articles
                         {% endif %}
                     </p>
-                    <p class="text-danger">100 reactions</p>
+                    <!-- <p class="text-danger">100 reactions</p> -->
                 </section>
 
                 <section>

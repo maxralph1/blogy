@@ -20,25 +20,24 @@
     {% endblock %}
 
     {% block main %}
-
         <section>
-
             <article class="blog-post">
-                <section class="d-flex justify-content-end">
+                <section class="d-flex justify-content-start">
                     <img src="
                         {% if author.photo != 'images/default.png' %}
                             {{ author.photo.url }}
                         {% else %}
                             
                         {% endif %}
-                    " class="object-fit-cover rounded" alt="" width="20%" height="20%">
+                    " class="object-fit-cover rounded" alt="" width="20%"">
                 </section>
 
                 <section class="mt-3">
-                    {{ author.body|safe }}
+                    {{ author.about_me }}
                 </section>
 
                 <section id="activities" class="activities mt-5">
+                    <h3 class="fs-4 text-danger border-bottom my-4 fst-italic">Author Activities</h3>
                     <ul class="nav nav-tabs d-flex justify-content-between fst-italic" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link text-danger fst-italic active" id="article-tab" data-bs-toggle="tab" data-bs-target="#article-tab-pane" type="button" role="tab" aria-controls="article-tab-pane" aria-selected="true">Article{% if articles_count < 2 %} {% else %}s{% endif %} ({{ articles_count }})</button>
@@ -51,63 +50,58 @@
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="article-tab-pane" role="tabpanel" aria-labelledby="article-tab" tabindex="0">
-                        <div class="d-flex flex-column gap-3">
-                            {% for article in articles_by_author %}
-                                <div class="article fst-italic text-end border-top py-3 d-flex flex-column">
-                                    <span class="fw-bold"><a href="{% url 'pages:article' article.slug %}" class="fw-bold text-danger">{{ article.title|truncatewords:35 }}</a></span>
-                                    <span>{{ article.body|truncatewords:45|safe }}</span>
-                                    <br />
-                                    <span>on {{ article.created_at }}</span>
-                                </div>
-                                
+                        <div class="tab-pane fade show active" id="article-tab-pane" role="tabpanel" aria-labelledby="article-tab" tabindex="0">
+                            <div class="d-flex flex-column gap-3">
+                                {% for article in articles_by_author %}
+                                    <div class="article fst-italic text-end border-top py-3 d-flex flex-column">
+                                        <span class="fw-bold"><a href="{% url 'pages:article' article.slug %}" class="fw-bold text-danger">{{ article.title|truncatewords:35 }}</a></span>
+                                        <span>{{ article.body|truncatewords:45|safe }}</span>
+                                        <br />
+                                        <span>on {{ article.created_at }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-center fs-5 my-4">There are no existing articles yet by author.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="comments-tab-pane" role="tabpanel" aria-labelledby="comments-tab" tabindex="0">
+                            <div class="d-flex flex-column gap-3">
+                                {% for comment in comments_by_author %}
+                                    <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
+                                        <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
+                                        <span>{{ comment.body|truncatewords:45|safe }}</span>
+                                        <span>on {{ comment.created_at }}</span>
+                                        <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ comment.article.title|truncatewords:15 }}</a></span>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-center fs-5 my-4">There are no existing comments yet by author.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="likes-tab-pane" role="tabpanel" aria-labelledby="likes-tab" tabindex="0">
+                            {% for like in likes_by_author %}
+                                {% if like.article %}
+                                    <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
+                                        <span>Liked article: <a href="{% url 'pages:article' like.article.slug %}" class="fw-bold text-danger">{{ like.article.title|truncatewords:13|safe }}</a></span>
+                                        <span>{{ like.article.body|truncatewords:23|safe }}</span>
+                                        <span>on {{ like.created_at }}</span>
+                                    </div>
+                                {% elif like.comment %}
+                                    <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
+                                        <span>Liked comment: <span class="fw-bold">{{ like.comment.title|truncatewords:35|safe }}</span></span>
+                                        <span>{{ like.comment.body|truncatewords:45|safe }}</span>
+                                        <span>on {{ like.comment.created_at }}</span>
+                                        <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ like.comment.article.title|truncatewords:15 }}</a></span>
+                                    </div>
+                                {% endif %}
                             {% empty %}
-                                <p class="text-center fs-5 my-4">There are no existing articles yet by author.</p>
+                                <p class="text-center fs-5 my-4">There are no existing likes yet by author.</p>
                             {% endfor %}
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="comments-tab-pane" role="tabpanel" aria-labelledby="comments-tab" tabindex="0">
-                        <div class="d-flex flex-column gap-3">
-                            {% for comment in comments_by_author %}
-                                <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
-                                    <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
-                                    <span>{{ comment.body|truncatewords:45|safe }}</span>
-                                    <span>on {{ comment.created_at }}</span>
-                                    <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ comment.article.title|truncatewords:15 }}</a></span>
-                                </div>
-                                
-                            {% empty %}
-                                <p class="text-center fs-5 my-4">There are no existing comments yet by author.</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="likes-tab-pane" role="tabpanel" aria-labelledby="likes-tab" tabindex="0">
-                        {% for like in likes_by_author %}
-                            {% if like.article %}
-                                <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
-                                    <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
-                                    <span>{{ comment.body|truncatewords:45|safe }}</span>
-                                    <span>on {{ comment.created_at }}</span>
-                                    <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ comment.article.title|truncatewords:15 }}</a></span>
-                                </div>
-                            {% elif like.comment %}
-                                <div class="comment fst-italic text-end border-top py-3 d-flex flex-column">
-                                    <span class="fw-bold">{{ comment.title|truncatewords:35|safe }}</span>
-                                    <span>{{ comment.body|truncatewords:45|safe }}</span>
-                                    <span>on {{ comment.created_at }}</span>
-                                    <span class="fs-6">for article <a href="{% url 'pages:article' comment.article.slug %}" class="fw-bold text-danger">{{ comment.article.title|truncatewords:15 }}</a></span>
-                                </div>
-                            {% endif %}
-                        {% empty %}
-                            <p class="text-center fs-5 my-4">There are no existing likes yet by author.</p>
-                        {% endfor %}
-                    </div>
                     </div>
                 </section>
             </article>
-
         </section>
-
     {% endblock %}
 
 {% endblock %}

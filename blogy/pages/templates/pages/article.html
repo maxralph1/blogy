@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block styles %}
-    <style>
+    <!-- <style>
         .reaction input {
         display: none;
         }
@@ -39,14 +39,10 @@
         .reaction input:checked~label:before {
         color: red !important;
         }
-    </style>
+    </style> -->
 {% endblock %}
 
 {% block title %}Article {{ article.title }}{% endblock %}
-
-{% block hero %}
-
-{% endblock %}
 
 {% block content %}
     
@@ -55,14 +51,20 @@
             <h2 class="blog-post-title">
                 {{ article.title }}
             </h2>
-            <p class="blog-post-meta">{{ article.created_at }} by <a href="#" class="text-danger">{{ article.added_by.name }}</a></p>
+            <p class="blog-post-meta">{{ article.created_at }} by <a href="{% url 'pages:author' article.added_by.username %}" class="text-danger">{{ article.added_by.name }}</a></p>
         </section>
     {% endblock %}
 
     {% block main %}
-
         <section>
-
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message|safe }}</strong>. 
+                    <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
             <article class="blog-post">
                 <section>
                     <img src="
@@ -80,21 +82,27 @@
 
                 <section class="comments-likes d-flex justify-content-between mt-5 mb-3 position-relative">
                     <p class="text-danger">
-                        {% if comments_count < 2 %}
-                            {{ comments_count }} comment
+                        {% if article.comment_set.all.count < 2 %}
+                            {{ article.comment_set.all.count }} comment
                         {% else %}
-                            {{ comments_count }} comments
+                            {{ article.comment_set.all.count }} comments
                         {% endif %}
                         &nbsp;&nbsp;&nbsp; <a href="#comment_form" class="text-danger fw-bold">Add a comment</a>
                     </p>
                     <p class="text-danger">
-                        100 reactions 
-                        &nbsp;&nbsp;&nbsp; <a id="reaction-emoji" class="text-danger fw-bold">Like 👍</a>
+                        {% if likes_count < 2 %}
+                            {{ likes_count }} like
+                        {% else %}
+                            {{ likes_count }} likes
+                        {% endif %} 
+                        &nbsp;&nbsp;&nbsp; <a href="{% url 'posts:add_remove_article_like' article.slug %}" id="reaction-emoji" class="text-danger fw-bold">
+                            {% if article_like %}Unlike{% else %}Like 👍{% endif %}
+                        </a>
                     </p>
 
                     <!-- <div id="reaction" class="position-absolute d-flex justify-content-end w-100 reaction">
                         <div class="w-75 py-4 card border border-secondary border-rounded bg-white text-center d-flex justify-content-around flex-row gap-2 flex-wrap reaction-input">
-                            <!-- <a href="#" style="transform: scale(2);">👍</a>
+                            <a href="#" style="transform: scale(2);">👍</a>
                             <a style="transform: scale(2);">😍</a>
                             <a style="transform: scale(2);">😂</a>
                             <a style="transform: scale(2);">😮</a>
@@ -182,16 +190,13 @@
                                 <span class="fs-6">by <a href="{% url 'pages:author' comment.added_by.username %}" class="text-danger">{{ comment.added_by.name }}</a></span>
                                 <span>on {{ comment.created_at }}</span>
                             </div>
-                            
                         {% empty %}
                             <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
                         {% endfor %}
                     </div>
                 </section>
             </article>
-
         </section>
-
     {% endblock %}
 
 {% endblock %}

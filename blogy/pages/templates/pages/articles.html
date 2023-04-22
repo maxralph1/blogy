@@ -3,10 +3,6 @@
 
 {% block title %}Articles{% endblock %}
 
-{% block hero %}
-
-{% endblock %}
-
 {% block content %}
     
     {% block heading %}
@@ -15,9 +11,7 @@
         </h2>
     {% endblock %}
 
-
     {% block main %}
-
         <section>
             {% if articles_objects %}
                 {% for article in articles_objects %}
@@ -29,8 +23,8 @@
                                         <strong class="d-inline-block mb-2 text-{{ article.topic.representative_color }}">{{ article.topic.title }}</strong>
                                         <h3 class="mb-2">{{ article.title }}</h3>
                                         <div class="mb-2 text-body-secondary">{{ article.created_at }}</div>
-                                        <p class="mb-2">{{ article.body|safe }}</p>
-                                        <a href="#" class="text-decoration-none text-secondary mb-2">by {{ article.added_by.name }}</a>
+                                        <p class="mb-2">{{ article.body|truncatewords:45|safe }}</p>
+                                        <a href="{% url 'pages:author' article.added_by.username %}" class="text-decoration-none text-secondary mb-2">by {{ article.added_by.name }}</a>
                                         <a href="{% url 'pages:article' article.slug %}" class="stretched-link text-danger">Continue reading</a>
                                     </div>
                                     <div class="comments-likes d-flex justify-content-between px-4 pb-4">
@@ -41,7 +35,13 @@
                                                 {{ article.comment_set.all.count }} comments
                                             {% endif %}
                                         </a>
-                                        <a class="text-danger">100 reactions</a>
+                                        <a class="text-danger">
+                                            {% if article.like_set.all.count < 2 %}
+                                                {{ article.like_set.all.count }} like
+                                            {% else %}
+                                                {{ article.like_set.all.count }} likes
+                                            {% endif %}
+                                        </a>
                                     </div>
                                     <div class="col-auto d-none d-lg-block">
                                         <img src="
@@ -76,8 +76,6 @@
                 {% endif %}
             </nav>
         </section>
-
     {% endblock %}
-
 
 {% endblock %}

@@ -57,11 +57,5 @@ urlpatterns = [
         TemplateView.as_view(
             template_name='accounts/users/delete_confirm.html'),
         name='delete_confirmation',
-    ),
-
-    # # User Activities
-    # path('<slug:user_slug>/articles/', views.user_articles, name='user_articles'),
-    # path('<slug:user_slug>/comments/', views.user_comments, name='user_comments'),
-    # path('<slug:user_slug>/reactions/',
-    #      views.user_reactions, name='user_reactions')
+    )
 ]

@@ -5,9 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from posts.models import Topic, Article
 
 
-# def categories(request):
-#     return {"categories": Category.objects.filter(level=0)}
-
 def random_topics(request):
     topics = Topic.objects.filter(is_active=True)
     topics_list = list(topics)

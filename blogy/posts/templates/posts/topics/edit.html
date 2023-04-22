@@ -4,6 +4,8 @@
 
 {% block title %}Update Topic{% endblock %}
 
+{% block heading %}Update Topic{% endblock %}
+
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="{% url 'posts:topics' %}" class="text-dark">Topics</a></li>
@@ -42,7 +44,7 @@
                         </div>
                         <div class="row">
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-warning text-white text-end">Update Topic</button>
+                                <button type="submit" class="btn btn-warning text-dark fw-bold text-end">Update Topic</button>
                             </div>
                         </div>
                     </form>

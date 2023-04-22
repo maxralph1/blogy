@@ -2,7 +2,13 @@
 
 {% load static %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock %}
+
 {% block title %}Comments{% endblock %}
+
+{% block heading %}Comments{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-dark">Dashboard</a></li>
@@ -43,7 +49,7 @@
                                         </div>
                                         <div class="d-flex flex-column text-end w-100 mt-5 px-1">
                                             <span class="d-flex flex-column fs-6 fst-italic text-muted">Commented on ...</span>
-                                            <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-4 py-1 fs-5 text-break text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
+                                            <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-3 py-1 fs-5 text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
                                             <h6 class="font-medium fst-italic">{{ comment.article.title|truncatewords:25 }}</h6>
                                             <p class="d-flex flex-column fs-6 fst-italic text-muted">
                                                 <span class="fst-italic text-muted px-1">by {{ comment.article.added_by.name|truncatewords:25 }}</span>
@@ -81,7 +87,7 @@
                 <div class="comment-widgets scrollable">
                     {% if comments_by_others_on_my_articles_objects %}
                         {% for comment in comments_by_others_on_my_articles_objects %}
-                            
+                            {% if comment.added_by != request.user %}
                                 <div class="d-flex flex-row comment-row border-top">
                                     <a href="{% url 'posts:view_comment' comment.slug %}" class="text-dark d-flex flex-wrap align-items-center">
                                         <div class="comment-text active">
@@ -106,7 +112,7 @@
                                             </div>
                                             <div class="d-flex flex-column text-end w-100 mt-5 px-1">
                                                 <span class="d-flex flex-column fs-6 fst-italic text-muted">Commented on ...</span>
-                                                <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-4 py-1 fs-5 text-break text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
+                                                <p class="label label-{{ comment.article.topic.representative_color }} label-rounded px-3 py-1 fs-5 text-end w-50 align-self-end">{{ comment.article.topic.title }}</p>
                                                 <h6 class="font-medium fst-italic">{{ comment.article.title|truncatewords:25 }}</h6>
                                                 <p class="d-flex flex-column fs-6 fst-italic text-muted">
                                                     <span class="fst-italic text-muted px-1">by {{ comment.article.added_by.name|truncatewords:25 }}</span>
@@ -116,7 +122,7 @@
                                         </div>
                                     </a>
                                 </div>
-                            
+                            {% endif %}
                         {% endfor %}
                     {% else %}
                             <p class="text-center fs-5 my-4">There are no existing comments yet by others on your articles.</p>

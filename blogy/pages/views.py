@@ -111,10 +111,20 @@ def article(request, article_slug):
     article = get_object_or_404(
         Article, slug=article_slug, is_active=True)
 
+    if request.user.is_authenticated:
+        article_like = Like.objects.filter(like_dislike=True,
+                                           article=article, added_by=request.user).exists()
+    else:
+        article_like = None
+
     comments_belonging_to_article = Comment.objects.filter(
         article=article, is_active=True).order_by('-updated_at')
 
+    likes_belonging_to_article = Like.objects.filter(
+        like_dislike=True, article=article, is_active=True).order_by('-updated_at')
+
     comments_count = comments_belonging_to_article.count()
+    likes_count = likes_belonging_to_article.count()
 
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
@@ -141,9 +151,12 @@ def article(request, article_slug):
 
     return render(request, 'pages/article.html', {
         'article': article,
+        'article_like': article_like,
         'comments_belonging_to_article': comments_belonging_to_article,
         'comments_count': comments_count,
-        'comment_form': comment_form
+        'comment_form': comment_form,
+        'likes_belonging_to_article': likes_belonging_to_article,
+        'likes_count': likes_count
     })
 
 
@@ -170,6 +183,14 @@ def topic(request, topic_slug):
 
 
 def hot_picks(request):
+    latest_comments_for_hot_articles = list(
+        set(Comment.objects.values_list('article__title', flat=True).order_by('-created_at')[:100]))
+
+    hot_articles = Article.objects.filter(
+        title__in=latest_comments_for_hot_articles, is_active=True).order_by('-created_at')
+
+    return render(request, 'pages/hot_picks.html', {'hot_articles': hot_articles})
+
     # def commented_on_recently(self):
     #     # return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
     #     self.comment.created_at
@@ -197,17 +218,8 @@ def hot_picks(request):
 
     # comments = Comment.objects.filter(created_at__range=[date.today(), date.today() + timedelta(days=2)])
 
-    latest_comments_for_hot_articles = list(
-        set(Comment.objects.values_list('article__title', flat=True).order_by('-created_at')[:100]))
-
-    hot_articles = Article.objects.filter(
-        title__in=latest_comments_for_hot_articles, is_active=True).order_by('-created_at')
-
-    return render(request, 'pages/hot_picks.html', {'hot_articles': hot_articles})
-
 
 def search(request):
-
     if request.method == 'GET':
 
         query = request.GET.get('search')
@@ -217,7 +229,8 @@ def search(request):
             Q(body__icontains=query) |
             Q(topic__title__icontains=query) |
             Q(topic__description__icontains=query) |
-            Q(added_by__name__icontains=query)
+            Q(added_by__name__icontains=query),
+            is_active=True
         )
 
         results_count = articles.count()

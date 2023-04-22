@@ -7,14 +7,8 @@
                 <li>
                     <div class="user-profile d-flex no-block dropdown m-t-20">
                         <div class="user-pic">
-                            <img src="
-                                {% if request.user.photo != 'images/default.png' %}
-                                    {{ request.user.photo.url }}
-                                {% else %}
-                                    {% static 'images/no-image.png' %}
-                                {% endif %}
-                                " alt="{{ request.user.name }}"
-                                class="rounded-circle" width="40" />
+                            <img src="{% if request.user.photo != 'images/default.png' %}{{ request.user.photo.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}" alt="{{ request.user.name }}"
+                                class="object-fit-cover" width="40" height="40" />
                             </div>
                         <div class="user-content hide-menu m-l-10">
                             <a href="#" class="" id="Userdd" role="button"
@@ -49,10 +43,12 @@
                         href="{% url 'posts:topics' %}" aria-expanded="false"><i
                             class="mdi mdi-comment"></i><span class="hide-menu">Topics</span></a>
                 </li>
-                <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                        href="{% url 'posts:authors' %}" aria-expanded="false"><i
-                            class="mdi mdi-account-multiple"></i><span class="hide-menu">Authors</span></a>
-                </li>
+                {% if request.user.is_staff %}
+                    <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                            href="{% url 'posts:authors' %}" aria-expanded="false"><i
+                                class="mdi mdi-account-multiple"></i><span class="hide-menu">Authors</span></a>
+                    </li>
+                {% endif %}
                 <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
                         href="{% url 'accounts:profile' %}" aria-expanded="false"><i
                             class="mdi mdi-account"></i><span class="hide-menu">My Profile</span></a>

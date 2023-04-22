@@ -5,4 +5,3 @@ btnClose.addEventListener('click', (e) => {
     btnClose.classList.add('d-none')
 })
 
-console.log('hello')

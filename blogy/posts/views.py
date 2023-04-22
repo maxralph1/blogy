@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from .models import Topic, Article, Comment, Like
 from accounts.models import UserModel
+from .models import Topic, Article, Comment, Like
 from .forms import TopicForm, ArticleForm, CommentForm
 
 
@@ -262,8 +262,33 @@ def view_author(request, username):
     author = get_object_or_404(
         UserModel, username=username, is_active=True)
 
+    topics_by_author = Topic.objects.filter(
+        added_by=author, is_active=True).order_by('-updated_at')
+
+    articles_by_author = Article.objects.filter(
+        added_by=author, is_active=True).order_by('-updated_at')
+
+    comments_by_author = Comment.objects.filter(
+        added_by=author, is_active=True).order_by('-updated_at')
+
+    likes_by_author = Like.objects.filter(
+        added_by=author, is_active=True).order_by('-updated_at')
+
+    topics_count = topics_by_author.count()
+    articles_count = articles_by_author.count()
+    comments_count = comments_by_author.count()
+    likes_count = likes_by_author.count()
+
     return render(request, 'posts/authors/author.html', {
-        'author': author
+        'author': author,
+        'topics_by_author': topics_by_author,
+        'articles_by_author': articles_by_author,
+        'comments_by_author': comments_by_author,
+        'likes_by_author': likes_by_author,
+        'topics_count': topics_count,
+        'articles_count': articles_count,
+        'comments_count': comments_count,
+        'likes_count': likes_count
     })
 
 
@@ -438,35 +463,94 @@ def delete_comment(request, comment_slug):
 
 @login_required
 def likes(request):
+    # (my) likes on other authors' articles
     if request.user.is_staff:
-        topics_likes = Like.objects.filter(like_dislike=True, is_active=True)
-        articles_likes = Like.objects.filter(like_dislike=True, is_active=True)
-        comments_likes = Like.objects.filter(like_dislike=True, is_active=True)
+        likes_by_me = Like.objects.filter(
+            is_active=True).order_by('-updated_at')
     else:
-        topics_likes = Like.objects.filter(
-            like_dislike=True, added_by=request.user, is_active=True)
-        articles_likes = Like.objects.filter(
-            like_dislike=True, added_by=request.user, is_active=True)
-        comments_likes = Like.objects.filter(
-            like_dislike=True, added_by=request.user, is_active=True)
+        likes_by_me = Like.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
 
-    topics_likes_count = topics_likes.count()
-    articles_likes_count = articles_likes.count()
-    comments_likes_count = comments_likes.count()
+    paginator = Paginator(likes_by_me, per_page=5)
+    likes_by_me_objects = paginator.get_page(1)
+    likes_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        1)
 
+    # likes by others on (my) articles
+    likes_by_others_on_my_articles = Like.objects.exclude(
+        added_by=request.user).filter(article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(likes_by_others_on_my_articles, per_page=5)
+    likes_by_others_on_my_articles_objects = paginator.get_page(1)
+    likes_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        1)
+
+    # general render
     return render(request, 'posts/likes/index.html', {
-        'topics_likes': topics_likes,
-        'articles_likes': articles_likes,
-        'comments_likes': comments_likes,
-        'topics_likes_count': topics_likes_count,
-        'articles_likes_count': articles_likes_count,
-        'comments_likes_count': comments_likes_count
+        'likes_by_me_objects': likes_by_me_objects,
+        'likes_by_others_on_my_articles_objects': likes_by_others_on_my_articles_objects
+    })
+
+    # if request.user.is_staff:
+    #     topics_likes = Like.objects.filter(like_dislike=True, is_active=True)
+    #     articles_likes = Like.objects.filter(like_dislike=True, is_active=True)
+    #     comments_likes = Like.objects.filter(like_dislike=True, is_active=True)
+    # else:
+    #     topics_likes = Like.objects.filter(
+    #         like_dislike=True, added_by=request.user, is_active=True)
+    #     articles_likes = Like.objects.filter(
+    #         like_dislike=True, added_by=request.user, is_active=True)
+    #     comments_likes = Like.objects.filter(
+    #         like_dislike=True, added_by=request.user, is_active=True)
+
+    # topics_likes_count = topics_likes.count()
+    # articles_likes_count = articles_likes.count()
+    # comments_likes_count = comments_likes.count()
+
+    # return render(request, 'posts/likes/index.html', {
+    #     'topics_likes': topics_likes,
+    #     'articles_likes': articles_likes,
+    #     'comments_likes': comments_likes,
+    #     'topics_likes_count': topics_likes_count,
+    #     'articles_likes_count': articles_likes_count,
+    #     'comments_likes_count': comments_likes_count
+    # })
+
+
+@login_required
+def likes_pages(request, page=1):
+    # (my) likes on other authors' articles
+    if request.user.is_staff:
+        likes_by_me = Like.objects.filter(
+            is_active=True).order_by('-updated_at')
+    else:
+        likes_by_me = Like.objects.filter(
+            added_by=request.user, is_active=True).order_by('-updated_at')
+
+    paginator = Paginator(likes_by_me, per_page=5)
+    likes_by_me_objects = paginator.get_page(page)
+    likes_by_me_objects.adjusted_elided_pages = paginator.get_elided_page_range(
+        page)
+
+    # likes by others on my articles
+    likes_by_others_on_my_articles = Like.objects.exclude(added_by=request.user).filter(
+        article__added_by=request.user).order_by('-updated_at')
+
+    paginator2 = Paginator(likes_by_others_on_my_articles, per_page=5)
+    likes_by_others_on_my_articles_objects = paginator.get_page(page)
+    likes_by_others_on_my_articles_objects.adjusted_elided_pages = paginator2.get_elided_page_range(
+        page)
+
+    # general render
+    return render(request, 'posts/likes/index.html', {
+        'likes_by_me_objects': likes_by_me_objects,
+        'likes_by_others_on_my_articles_objects': likes_by_others_on_my_articles_objects
     })
 
 
 @login_required
 def add_remove_topic_like(request, topic_slug):
-    like = Like.objects.get(topic__slug=topic_slug, added_by=request.user)
+    like = Like.objects.filter(topic__slug=topic_slug, added_by=request.user)
 
     if like.exists():
         Like.objects.filter(like_dislike=True).update(default=False)
@@ -485,21 +569,33 @@ def add_remove_topic_like(request, topic_slug):
 
 @login_required
 def add_remove_article_like(request, article_slug):
-    like = Like.objects.get(article__slug=article_slug, added_by=request.user)
+    article = get_object_or_404(
+        Article, slug=article_slug, is_active=True)
 
-    if like.exists():
-        Like.objects.filter(like_dislike=True).update(default=False)
-        Like.objects.filter(like_dislike=False).update(default=True)
-    else:
+    liked = Like.objects.filter(
+        like_dislike=True, article__slug=article.slug, added_by=request.user).first()
+
+    unliked = Like.objects.filter(
+        like_dislike=False, article__slug=article.slug, added_by=request.user).first()
+
+    if liked:
+        Like.objects.filter(like_dislike=True, article__slug=article.slug,
+                            added_by=request.user).update(like_dislike=False)
+    elif unliked:
+        Like.objects.filter(like_dislike=False, article__slug=article.slug,
+                            added_by=request.user).update(like_dislike=True)
+    elif (liked == None) and (unliked == None):
         Like.objects.create(
             like_dislike=True,
             slug=slugify(
                 str(article_slug) + str(datetime.now()), allow_unicode=False
             ),
+            article=article,
             added_by=request.user
         )
 
-    messages.success(request, 'You reacted on this article')
+    messages.success(request, 'You reacted to this article')
+    return redirect('pages:article', article.slug)
 
 
 @login_required
@@ -507,8 +603,8 @@ def add_remove_comment_like(request, comment_slug):
     like = Like.objects.get(comment__slug=comment_slug, added_by=request.user)
 
     if like.exists():
-        Like.objects.filter(like_dislike=True).update(default=False)
-        Like.objects.filter(like_dislike=False).update(default=True)
+        Like.objects.filter(like_dislike=True).update(like_dislike=False)
+        Like.objects.filter(like_dislike=False).update(like_dislike=True)
     else:
         Like.objects.create(
             like_dislike=True,

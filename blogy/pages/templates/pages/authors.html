@@ -15,9 +15,7 @@
         </h2>
     {% endblock %}
 
-
     {% block main %}
-
         <section>
             {% if authors_objects %}
                 {% for author in authors_objects %}
@@ -27,13 +25,7 @@
                                 <div class="col-md-12">
                                     <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                                         <div class="col-md-4">
-                                            <img src="
-                                                {% if article.photo != 'images/default.png' %}
-                                                    {{ author.photo.url }}
-                                                {% else %}
-                                                    
-                                                {% endif %}
-                                            " href="{% url 'pages:author' author.username %}" class="object-fit-cover img-fluid rounded-start" alt="" width="100%" height="100%">
+                                            <img src="{% if article.photo != 'images/default.png' %}{{ author.photo.url }}{% else %} {% endif %}" href="{% url 'pages:author' author.username %}" class="object-fit-cover img-fluid rounded-start" alt="" width="100%" height="100%">
                                         </div>
                                         <div class="col-md-8">
                                             <div class="card-body">
@@ -44,19 +36,24 @@
                                                 {% else %}
                                                     <p class="card-text">(Author is yet to provide any information about them.)</p>
                                                 {% endif %}
-                                                
                                                 <p class="card-text"><small class="text-body-secondary">Joined {{ author.created_at }}</small></p>
-                                                <div class="activities d-flex justify-content-start gap-3">
-                                                    <a href="{% url 'pages:author' author.username %}#comments" class="text-danger">
+                                                <div class="activities d-flex justify-content-between gap-3">
+                                                    <a href="{% url 'pages:author' author.username %}#comments-tab-pane" class="text-danger">
                                                         {% if author.comment_set.all.count < 2 %}
                                                             {{ author.comment_set.all.count }} comment
                                                         {% else %}
                                                             {{ author.comment_set.all.count }} comments
                                                         {% endif %}
                                                     </a>
-                                                    <a class="text-danger">100 reactions</a>
-                                                    <a class="text-danger">100 reactions</a>
-                                                    <a class="text-danger">100 reactions</a>
+                                                    <!-- <a class="text-danger">100 reactions</a>
+                                                    <a class="text-danger">100 reactions</a> -->
+                                                    <a href="{% url 'pages:author' author.username %}#likes-tab-pane" class="text-danger">
+                                                        {% if author.like_set.all.count < 2 %}
+                                                            {{ author.like_set.all.count }} like
+                                                        {% else %}
+                                                            {{ author.like_set.all.count }} likes
+                                                        {% endif %}
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
