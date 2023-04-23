@@ -9,6 +9,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('posts/', include('posts.urls', namespace='posts')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]
 
 if settings.DEBUG:

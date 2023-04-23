@@ -71,38 +71,38 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     )
     phone = models.CharField(
         _('Phone Number'),
-        max_length=20,
+        max_length=35,
         null=True,
         blank=True
     )
     photo = models.ImageField(
-        verbose_name=_('Blogger photo'),
-        help_text=_('Upload image'),
-        upload_to='images/bloggers/',
+        verbose_name=_('Author Photo'),
+        help_text=_('Upload photo'),
+        upload_to='images/authors/',
         default='images/default.png',
         null=True,
         blank=True
     )
     about_me = models.TextField(
         _('About me'),
-        max_length=100,
+        max_length=255,
         null=True,
         blank=True
     )
     web = models.CharField(
-        verbose_name=_('Blogger Website'),
+        verbose_name=_('Author Website'),
         max_length=255,
         null=True,
         blank=True
     )
     instagram = models.CharField(
-        verbose_name=_('Blogger Instagram'),
+        verbose_name=_('Author Instagram'),
         max_length=255,
         null=True,
         blank=True
     )
     twitter = models.CharField(
-        verbose_name=_('Blogger Twitter'),
+        verbose_name=_('Author Twitter'),
         max_length=255,
         null=True,
         blank=True
@@ -135,7 +135,7 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-    @property
-    def photo_url(self):
-        if self.photo and hasattr(self.photo, 'url'):
-            return self.photo.url
+    # @property
+    # def photo_url(self):
+    #     if self.photo and hasattr(self.photo, 'url'):
+    #         return self.photo.url

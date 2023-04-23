@@ -14,8 +14,7 @@ class Topic(models.Model):
         unique=True,
     )
     slug = models.SlugField(
-        verbose_name=_(
-            'Topic safe URL'),
+        verbose_name=_('Topic safe URL'),
         max_length=255,
         unique=True)
     description = models.CharField(
@@ -24,6 +23,8 @@ class Topic(models.Model):
         max_length=255,
     )
     representative_color = models.CharField(
+        verbose_name=_('Representive Color for Topic'),
+        help_text=_('Color for display of Topic to site visitors'),
         max_length=10,
         default='secondary'
     )
@@ -36,14 +37,14 @@ class Topic(models.Model):
     created_at = models.DateTimeField(
         _('Created at'), auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(_('Deleted at'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
 
     def get_absolute_url(self):
-        return reverse('posts:topics', args=[self.slug])
+        return reverse('posts:view_topic', args=[self.slug])
 
     def __str__(self):
         return self.title
@@ -51,14 +52,14 @@ class Topic(models.Model):
 
 class Article(models.Model):
     is_featured = models.BooleanField(
-        verbose_name=_('Make article Featured'),
+        verbose_name=_('Make Article Featured'),
         help_text=_('Change make article featured on index(home) page'),
         default=False,
     )
     title = models.CharField(
         verbose_name=_('Article Title'),
-        help_text=_('Required, unique and 20 charcters maximum'),
-        max_length=255,
+        help_text=_('Required and unique'),
+        max_length=150,
         unique=True,
     )
     slug = models.SlugField(
@@ -72,7 +73,7 @@ class Article(models.Model):
     )
     image = models.ImageField(
         verbose_name=_('Article Preview Image'),
-        help_text=_('Upload image image'),
+        help_text=_('Upload Article Image'),
         upload_to='images/articles/',
         default='images/default.png',
     )
@@ -97,7 +98,7 @@ class Article(models.Model):
         verbose_name_plural = _('Articles')
 
     def get_absolute_url(self):
-        return reverse('posts:articles', args=[self.slug])
+        return reverse('posts:view_article', args=[self.slug])
 
     def __str__(self):
         return self.title
@@ -112,7 +113,7 @@ class Article(models.Model):
 class Comment(models.Model):
     title = models.CharField(
         verbose_name=_('Comment Title'),
-        help_text=_('Required and unique'),
+        help_text=_('Comment Title'),
         max_length=255
     )
     slug = models.SlugField(
@@ -121,9 +122,11 @@ class Comment(models.Model):
         max_length=255,
         unique=True)
     body = models.TextField(
-        verbose_name=_('Body'),
+        verbose_name=_('Comment Body'),
+        help_text=_('Message must not exceed 255 characters'),
         max_length=255
     )
+    # topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     is_active = models.BooleanField(
@@ -145,7 +148,7 @@ class Like(models.Model):
     )
     slug = models.SlugField(
         verbose_name=_(
-            'Reaction safe URL'),
+            'Like safe URL'),
         max_length=255,
         unique=True
     )
@@ -169,8 +172,8 @@ class Like(models.Model):
     )
     added_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     is_active = models.BooleanField(
-        verbose_name=_('Reaction visibility'),
-        help_text=_('Change reaction visibility'),
+        verbose_name=_('Like visibility'),
+        help_text=_('Change like visibility'),
         default=True,
     )
     created_at = models.DateTimeField(

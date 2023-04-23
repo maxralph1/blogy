@@ -21,7 +21,7 @@ urlpatterns = [
 
     # Articles
     path('articles/', views.articles, name='articles'),
-    path('articles/<int:page>', views.articles_pages, name='articles_pages'),
+    path('articles/page=<int:page>/', views.articles_pages, name='articles_pages'),
     path('articles/add/', views.add_article, name='add_article'),
     path('articles/<slug:article_slug>/',
          views.view_article, name='view_article'),
@@ -43,7 +43,7 @@ urlpatterns = [
 
     # Comments
     path('comments/', views.comments, name='comments'),
-    path('comments/<int:page>', views.comments_pages, name='comments_pages'),
+    path('comments/page=<int:page>/', views.comments_pages, name='comments_pages'),
     path('articles/<slug:article_slug>/comments/add/',
          views.add_comment, name='add_comment'),
     path('comments/<slug:comment_slug>/',
@@ -56,7 +56,7 @@ urlpatterns = [
 
     # Likes
     path('likes/', views.likes, name='likes'),
-    path('likes/<int:page>', views.likes_pages, name='likes_pages'),
+    path('likes/page=<int:page>/', views.likes_pages, name='likes_pages'),
     path('likes/topics/<slug:topic_slug>/',
          views.add_remove_topic_like, name='add_remove_topic_like'),
     path('likes/articles/<slug:article_slug>/',

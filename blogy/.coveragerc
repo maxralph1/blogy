@@ -1,0 +1,4 @@
+[run]
+source = posts
+
+include = tests/*

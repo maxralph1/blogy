@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ckeditor',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -40,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'blogy.urls'
@@ -127,13 +129,29 @@ MEDIA_URL = '/media/'
 # MEDIA_ROOT = [BASE_DIR / 'static/' / 'images/']
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
 # Custom user model
 AUTH_USER_MODEL = 'accounts.UserModel'
 LOGIN_REDIRECT_URL = '/accounts/dashboard'
 LOGIN_URL = '/accounts/login/'
 
+
 # Email setting
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
+# If you are using gmail for this, setup 2-step verification and Application specific password and copy and paste that password in above EMAIL_HOST_PASSWORD value.
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    'localhost'
+]
 
 
 # CKEDITOR_BASEPATH = "/my_static/ckeditor/ckeditor/"
