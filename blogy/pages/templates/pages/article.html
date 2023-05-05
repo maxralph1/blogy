@@ -82,11 +82,13 @@
 
                 <section class="comments-likes d-flex justify-content-between mt-5 mb-3 position-relative">
                     <p class="text-danger">
-                        {% if article.comment_set.all.count < 2 %}
-                            {{ article.comment_set.all.count }} comment
-                        {% else %}
-                            {{ article.comment_set.all.count }} comments
-                        {% endif %}
+                        <a href="#comments" class="text-danger">
+                            {% if article.comment_set.all.count < 2 %}
+                                {{ article.comment_set.all.count }} comment
+                            {% else %}
+                                {{ article.comment_set.all.count }} comments
+                            {% endif %}
+                        </a>
                         &nbsp;&nbsp;&nbsp; <a href="#comment_form" class="text-danger fw-bold">Add a comment</a>
                     </p>
                     <p class="text-danger">
