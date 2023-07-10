@@ -1,0 +1,171 @@
+We implemented You-Tube like comment count where the actual number of comments are counted (both the deleted and active comments), but showing only the active comments
+
+
+
+models
+forms
+admin
+urls (general and local)
+
+use a particular pattern for all forms in this application
+
+in every view, update the user's last_seen. Add 'last_seen" field on the database
+
+work on everything in the accounts app
+
+work on the post views and forms together
+
+
+
+STEPS:
+
+add_topic
+topic
+
+add_article
+articles
+update_article
+delete
+
+add_comment
+comments
+update_comment
+delete
+
+work on the visitors' pages
+
+add_reaction
+
+view_users table page . At the top, it counts how many active users. It also shows the users' last_seen.
+
+finish the dashboard
+
+update_user_profile page
+
+add_newsletter
+
+a page for articles belonging to each topic on the visitors' pages
+
+{% if page_obj.has_previous %}
+                    <a href="{% url 'posts:articles' page_obj.previous_page_number %}">
+                        Previous Page
+                    </a>
+                {% endif%}
+                {% if page_obj.has_next %}
+                    <a href="{% url 'posts:articles' page_obj.next_page_number %}">
+                        Next Page
+                    </a>
+                {% endif%}
+
+
+
+
+
+# latest_articles_for_trending_topics = Article.objects.filter(
+    #     is_active=True).order_by('-created_at')[:100]
+
+    # for article in latest_articles_for_trending_topics:
+    #     latest_articles_list = list(set([article.topic.title]))
+
+    # trending_topics_list = list(
+    #     set(Article.objects.values_list('topic__title', flat=True)))
+
+    # trending_topics_list = list(
+    #     Article.objects.values_list('topic', flat=True).distinct())
+
+    # latest_articles_list = list(set(latest_articles_for_trending_topics))
+
+    # trending_topics_list = Article.objects.filter(
+    #     is_active=True).order_by('-created_at', '-topic').distinct()
+
+
+
+# 3
+# >> > def unique(xs):
+# ...     seen = set()
+# ...     seen_add = seen.add
+# ... return [x for x in xs if x not in seen and not seen_add(x)]
+# ...
+# >> > unique([1, 2, 3, 3, 4, 1, 3, 5, 5, 4, 6])
+# [1, 2, 3, 4, 5, 6]
+
+
+
+
+        {% for article in articles_objects %}
+                <h4>{{ article.title }}</h4>
+                
+                {% for comment in article.comment_set.all %}
+                    {{ article.comment_set.all.count }}
+                    - <p>{{comment.title}}</p>
+                {% empty %}
+                    <!-- no entries -->
+                {% endfor %}
+                <br>
+            {% endfor %}
+
+
+
+
+
+
+/// worked perfectly
+<section id="comments" class="comments">
+    {% for comment in article.comment_set.all %}
+        <p>{{comment.title}}</p>
+        <p>{{comment.body}}</p>
+    {% empty %}
+        <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
+    {% endfor %}
+</section>
+
+
+
+// Use this line and improve on it for tyhe user feeds
+// note the use of "user."
+
+    <section id="comments" class="comments">
+        {% for comment in user.comment_set.all %}
+            <p>{{comment.title}}</p>
+            <p>{{comment.body}}</p>
+        {% empty %}
+            <p class="text-center fs-5 my-4">There are no existing comments yet. <a href="#comment_tab" class="text-danger">Add One</a>.</p>
+        {% endfor %}
+    </section>
+
+
+
+
+def set_is_default_product_unit(request, product_slug, product_unit_slug):
+    ProductUnit.objects.filter(
+        product__slug=product_slug, is_product_default=True).update(is_product_default=False)
+
+    ProductUnit.objects.filter(
+        slug=product_unit_slug, product__slug=product_slug, is_product_default=False).update(is_product_default=True)
+
+    return redirect('inventory:view_product', product_slug)
+
+
+
+
+
+    {{ request.photo_url|default_if_none:'' }}
+
+
+
+
+<p><a href="{% url 'posts:set_as_featured_article' article.slug %}" class="btn btn-sm btn-danger text-white text-nowrap">Make Featured</a></p>
+
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'URL': 'postgresql://postgres:tm8OLjD7WMEUEq8zpNP2@containers-us-west-172.railway.app:6720/railway',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'tm8OLjD7WMEUEq8zpNP2',
+        'HOST': 'containers-us-west-172.railway.app',
+        'PORT': 6720,
+    }
+}

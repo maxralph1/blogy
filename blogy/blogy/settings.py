@@ -14,7 +14,21 @@ SECRET_KEY = 'django-insecure-dca(+e81r-&a(53^8=kt-7&imw!xfaeporifq8gp22fc%)i=r%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*',
+                 'blogy-production.up.railway.app',
+                 'railway.app',
+                 '.railway.app',
+                 'up.railway.app',
+                 '.up.railway.app',
+                 'app',
+                 '.app',
+                 'http://blogy-production.up.railway.app',
+                 'https://blogy-production.up.railway.app',
+                 'localhost',
+                 '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ['https://blogy-production.up.railway.app']
 
 
 # Application definition
