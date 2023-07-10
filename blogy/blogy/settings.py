@@ -116,9 +116,13 @@ USE_TZ = True
 # STATIC_URL = 'static/'
 # STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# STATIC_URL = '/static/'
+# # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -137,21 +141,23 @@ LOGIN_URL = '/accounts/login/'
 
 
 # Email setting
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'maxralph01@gmail.com'
+EMAIL_HOST_PASSWORD = 'aquu jujq cufm znfw'
 
 # If you are using gmail for this, setup 2-step verification and Application specific password and copy and paste that password in above EMAIL_HOST_PASSWORD value.
 
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    'localhost'
-]
+# INTERNAL_IPS = [
+#     # ...
+#     "127.0.0.1",
+#     'localhost'
+# ]
 
 
 # CKEDITOR_BASEPATH = "/my_static/ckeditor/ckeditor/"
