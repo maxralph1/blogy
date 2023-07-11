@@ -1,4 +1,4 @@
-#BlogySocial Blog and Social Media Application
+# BlogySocial Blog and Social Media Application
 
 Guides (usage and description) to the BlogySocial application.
 
@@ -49,7 +49,7 @@ cd C:\Users\maxim\Desktop>
 Here I changed directory into my personal Desktop space on my windows Computer. And then;
 
 ```
-mkdir blogy
+mkdir blogysocial
 ```
 
 Or whatever you wish to call the application
@@ -57,7 +57,7 @@ Or whatever you wish to call the application
 4. cd into this newly created folder
 
 ```
-cd blogy
+cd blogysocial
 ```
 
 and create a virtual environment
@@ -77,13 +77,13 @@ You may decide to skip this step (step 5), to install and run Django from the sy
 6. Clone this repository from here on Github using either of the 2 commands on your terminal:
 
 ```
-git clone https://github.com/maxralph1/blogy.git
+git clone https://github.com/maxralph1/blogysocial.git
 ```
 
 or
 
 ```
-git clone git@github.com:maxralph1/blogy.git
+git clone git@github.com:maxralph1/blogysocial.git
 ```
 
 7. Use the command below to install all dependencies I utilized in this application as can be seen from my requirements.txt file
@@ -92,10 +92,10 @@ git clone git@github.com:maxralph1/blogy.git
 pip install -r requirements.txt
 ```
 
-8. Now, cd into the "blogy" folder included from the cloned github repository and run the command below;
+8. Now, cd into the "blogysocial" folder included from the cloned github repository and run the command below;
 
 ```
-cd blogy
+cd blogysocial
 ```
 
 and

@@ -1,1 +1,1 @@
-web: gunicorn 'blogy.blogy.wsgi'
+web: gunicorn --chdir blogysocial 'blogysocial.wsgi'
